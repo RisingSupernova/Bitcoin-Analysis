@@ -1,0 +1,41 @@
+name: Bitcoin Analyst Daily Report
+
+on:
+  schedule:
+    # 04:00 UTC = 06:00 CEST (Malta summer) / 05:00 CET (Malta winter)
+    - cron: '0 4 * * 1-5'
+  workflow_dispatch: # Manual trigger from Actions tab
+
+permissions:
+  contents: write # Needed to commit history + recommendation
+
+jobs:
+  btc-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Bitcoin Analyst
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python btc_analyst.py
+
+      - name: Commit data
+        run: |
+          git config user.name "BTC Analyst Bot"
+          git config user.email "bot@btc-analyst.local"
+          git add data/previous_recommendation.json data/history.json data/report_*.html || true
+          RECOMMENDATION=$(python -c "import json; d=json.load(open('data/previous_recommendation.json')); print(d.get('recommendation','UNKNOWN'))" 2>/dev/null || echo "UNKNOWN")
+          git commit -m "₿ BTC report $(date +%Y-%m-%d) — $RECOMMENDATION" || echo "No changes to commit"
+          git push || echo "Push failed"
