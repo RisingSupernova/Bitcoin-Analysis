@@ -330,7 +330,12 @@ def aggregate_data(data: dict, history: list | None = None) -> str:
 # CLAUDE API
 # ---------------------------------------------------------------------------
 def call_claude(data_text: str, previous_rec: str) -> dict:
-    """Call Claude API with aggregated data. Retries on timeout."""
+    """Call Claude API with aggregated data. Retries on timeout.
+
+    Uses a total time budget (WALL_LIMIT_SECS) to guarantee the function
+    never exceeds the GitHub Actions job timeout, even in the worst-case
+    retry path.
+    """
     print("🤖 Calling Claude API...")
 
     if PROMPT_TEMPLATE.exists():
@@ -353,8 +358,7 @@ def call_claude(data_text: str, previous_rec: str) -> dict:
         "model": CLAUDE_MODEL,
         "max_tokens": 32000,
         "thinking": {
-            "type": "enabled",
-            "budget_tokens": 16000,
+            "type": "adaptive",
         },
         "tools": [{"type": "web_search_20250305", "name": "web_search"}],
         "messages": [{"role": "user", "content": prompt}],
@@ -367,18 +371,29 @@ def call_claude(data_text: str, previous_rec: str) -> dict:
             "Content-Type": "application/json",
             "x-api-key": ANTHROPIC_API_KEY,
             "anthropic-version": "2023-06-01",
-            "anthropic-beta": "interleaved-thinking-2025-05-14",
         },
         method="POST",
     )
 
     max_retries = 3
-    timeout_secs = 300  # 5 min — extended thinking + web search needs room
+    timeout_secs = 240       # 4 min per attempt (adaptive thinking is faster)
+    WALL_LIMIT_SECS = 660    # 11 min total wall-clock budget for API calls
+    wall_start = time.monotonic()
 
     for attempt in range(1, max_retries + 1):
+        elapsed = time.monotonic() - wall_start
+        remaining = WALL_LIMIT_SECS - elapsed
+        if remaining < 60:
+            print(f"  ⏱ Only {remaining:.0f}s left in wall-clock budget, aborting retries")
+            return {"error": f"Wall-clock budget exhausted after {elapsed:.0f}s"}
+
+        # Use the smaller of per-attempt timeout and remaining budget
+        effective_timeout = min(timeout_secs, int(remaining))
+
         try:
-            print(f"  Attempt {attempt}/{max_retries} (timeout: {timeout_secs}s)...")
-            with urlopen(req, timeout=timeout_secs) as resp:
+            print(f"  Attempt {attempt}/{max_retries} (timeout: {effective_timeout}s, "
+                  f"wall: {elapsed:.0f}s/{WALL_LIMIT_SECS}s)...")
+            with urlopen(req, timeout=effective_timeout) as resp:
                 result = json.loads(resp.read().decode("utf-8"))
                 print(f"  ✅ Claude responded (stop_reason: {result.get('stop_reason')})")
                 return result
