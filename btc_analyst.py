@@ -329,14 +329,109 @@ def aggregate_data(data: dict, history: list | None = None) -> str:
 # ---------------------------------------------------------------------------
 # CLAUDE API
 # ---------------------------------------------------------------------------
-def call_claude(data_text: str, previous_rec: str) -> dict:
-    """Call Claude API with aggregated data. Retries on timeout.
+def _read_sse_stream(resp) -> dict:
+    """Read an Anthropic SSE stream, reconstruct a Messages-API-shaped dict.
 
-    Uses a total time budget (WALL_LIMIT_SECS) to guarantee the function
-    never exceeds the GitHub Actions job timeout, even in the worst-case
-    retry path.
+    The Anthropic streaming format sends events like:
+        event: message_start
+        data: {"type": "message_start", "message": {...}}
+
+        event: content_block_start
+        data: {"type": "content_block_start", "index": 0, ...}
+
+        event: ping
+        data: {"type": "ping"}
+
+    We only need the ``data:`` lines; the ``type`` field inside the JSON
+    tells us what kind of event it is.
     """
-    print("🤖 Calling Claude API...")
+    content_blocks: list[dict] = []
+    stop_reason = None
+    message_shell: dict = {}
+    events_received = 0
+
+    for raw_line in resp:
+        line = raw_line.decode("utf-8", errors="replace").rstrip("\n\r")
+
+        # SSE lines we care about start with "data: "
+        if not line.startswith("data: "):
+            continue
+        payload = line[6:]
+        if payload == "[DONE]":
+            break
+
+        try:
+            event = json.loads(payload)
+        except json.JSONDecodeError:
+            continue
+
+        etype = event.get("type", "")
+        events_received += 1
+
+        # Progress indicator every 50 events
+        if events_received % 50 == 0:
+            print(f"    ... {events_received} SSE events received")
+
+        if etype == "message_start":
+            message_shell = event.get("message", {})
+
+        elif etype == "content_block_start":
+            idx = event.get("index", len(content_blocks))
+            block = event.get("content_block", {})
+            while len(content_blocks) <= idx:
+                content_blocks.append({})
+            content_blocks[idx] = block
+
+        elif etype == "content_block_delta":
+            idx = event.get("index", 0)
+            delta = event.get("delta", {})
+            if idx < len(content_blocks):
+                block = content_blocks[idx]
+                dtype = delta.get("type", "")
+                if dtype == "text_delta":
+                    block["text"] = block.get("text", "") + delta.get("text", "")
+                elif dtype == "thinking_delta":
+                    block["thinking"] = block.get("thinking", "") + delta.get("thinking", "")
+                elif dtype == "input_json_delta":
+                    block["_partial_json"] = block.get("_partial_json", "") + delta.get("partial_json", "")
+
+        elif etype == "content_block_stop":
+            idx = event.get("index", 0)
+            if idx < len(content_blocks):
+                block = content_blocks[idx]
+                if "_partial_json" in block:
+                    try:
+                        block["input"] = json.loads(block.pop("_partial_json"))
+                    except json.JSONDecodeError:
+                        block.pop("_partial_json", None)
+
+        elif etype == "message_delta":
+            delta = event.get("delta", {})
+            stop_reason = delta.get("stop_reason", stop_reason)
+
+        # ping, error, and other events are silently ignored
+
+    print(f"    Total SSE events: {events_received}")
+
+    result = {**message_shell}
+    result["content"] = content_blocks
+    result["stop_reason"] = stop_reason
+    return result
+
+
+def call_claude(data_text: str, previous_rec: str) -> dict:
+    """Call Claude API with **streaming** to avoid read-timeout on long generations.
+
+    Why streaming?
+    Non-streaming requests with large max_tokens + thinking + web_search
+    can take 5-10+ minutes of server-side processing.  During that time
+    zero bytes are sent to the client.  Networks (including GitHub Actions
+    runners) drop idle connections well before that, causing TimeoutError.
+
+    With ``"stream": true`` the server sends SSE events incrementally,
+    keeping the TCP connection alive throughout generation.
+    """
+    print("🤖 Calling Claude API (streaming)...")
 
     if PROMPT_TEMPLATE.exists():
         template = PROMPT_TEMPLATE.read_text()
@@ -357,46 +452,58 @@ def call_claude(data_text: str, previous_rec: str) -> dict:
     request_body = {
         "model": CLAUDE_MODEL,
         "max_tokens": 32000,
+        "stream": True,
         "thinking": {
-            "type": "adaptive",
+            "type": "enabled",
+            "budget_tokens": 16000,
         },
         "tools": [{"type": "web_search_20250305", "name": "web_search"}],
         "messages": [{"role": "user", "content": prompt}],
     }
 
-    req = Request(
-        "https://api.anthropic.com/v1/messages",
-        data=json.dumps(request_body).encode("utf-8"),
-        headers={
-            "Content-Type": "application/json",
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-        },
-        method="POST",
-    )
+    headers = {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "anthropic-beta": "interleaved-thinking-2025-05-14",
+    }
 
-    max_retries = 3
-    timeout_secs = 240       # 4 min per attempt (adaptive thinking is faster)
-    WALL_LIMIT_SECS = 660    # 11 min total wall-clock budget for API calls
+    max_retries = 2
+    # Socket timeout: how long to wait for the NEXT chunk of data.
+    # With streaming, chunks arrive every few seconds, so 300s is very
+    # generous and only fires if the connection is truly dead.
+    socket_timeout = 300
+    WALL_LIMIT_SECS = 900   # 15 min budget (workflow timeout is 20 min)
     wall_start = time.monotonic()
 
     for attempt in range(1, max_retries + 1):
         elapsed = time.monotonic() - wall_start
         remaining = WALL_LIMIT_SECS - elapsed
-        if remaining < 60:
+        if remaining < 120:
             print(f"  ⏱ Only {remaining:.0f}s left in wall-clock budget, aborting retries")
             return {"error": f"Wall-clock budget exhausted after {elapsed:.0f}s"}
 
-        # Use the smaller of per-attempt timeout and remaining budget
-        effective_timeout = min(timeout_secs, int(remaining))
+        # Build a fresh Request each attempt (urllib can be finicky on reuse)
+        req = Request(
+            "https://api.anthropic.com/v1/messages",
+            data=json.dumps(request_body).encode("utf-8"),
+            headers=headers,
+            method="POST",
+        )
 
         try:
-            print(f"  Attempt {attempt}/{max_retries} (timeout: {effective_timeout}s, "
+            print(f"  Attempt {attempt}/{max_retries} "
+                  f"(socket timeout: {socket_timeout}s, "
                   f"wall: {elapsed:.0f}s/{WALL_LIMIT_SECS}s)...")
-            with urlopen(req, timeout=effective_timeout) as resp:
-                result = json.loads(resp.read().decode("utf-8"))
-                print(f"  ✅ Claude responded (stop_reason: {result.get('stop_reason')})")
-                return result
+            with urlopen(req, timeout=socket_timeout) as resp:
+                result = _read_sse_stream(resp)
+
+            duration = time.monotonic() - wall_start - elapsed
+            print(f"  ✅ Claude responded in {duration:.0f}s "
+                  f"(stop_reason: {result.get('stop_reason')}, "
+                  f"blocks: {len(result.get('content', []))})")
+            return result
+
         except (URLError, HTTPError) as e:
             body = ""
             if hasattr(e, "read"):
@@ -405,7 +512,7 @@ def call_claude(data_text: str, previous_rec: str) -> dict:
             if body:
                 print(f"    Body: {body}")
             if attempt < max_retries:
-                wait = 10 * attempt
+                wait = 15
                 print(f"    Retrying in {wait}s...")
                 time.sleep(wait)
             else:
@@ -414,7 +521,7 @@ def call_claude(data_text: str, previous_rec: str) -> dict:
         except Exception as e:
             print(f"  ⚠ Attempt {attempt} failed: {type(e).__name__}: {e}")
             if attempt < max_retries:
-                wait = 10 * attempt
+                wait = 15
                 print(f"    Retrying in {wait}s...")
                 time.sleep(wait)
             else:
