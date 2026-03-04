@@ -62,7 +62,9 @@ Note: ETF flow data is already provided as hard data from SoSoValue API — do N
 
 **Agent 5: Derivatives/Positioning Analyst**
 - Analyze: CFTC COT positioning, sentiment (Fear/Greed)
-- Data: COT data from hard data, Fear/Greed index
+- Data: COT data from hard data (Traders in Financial Futures), Fear/Greed index
+- COT categories: Asset Managers (institutional longs), Leveraged Money (hedge funds, often short), Dealers
+- Key metric: Asset Manager net position (long - short) and week-over-week change
 - Thresholds: F&G <25 = extreme fear (contrarian bullish), >75 = extreme greed (contrarian bearish)
 - Signal: Is speculative positioning crowded? Net long or short change?
 - Output: direction, confidence

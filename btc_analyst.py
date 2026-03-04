@@ -157,10 +157,10 @@ def fetch_all_data() -> dict:
     status = "OK" if isinstance(results["mempool_diff"], dict) and "progressPercent" in results["mempool_diff"] else "MISSING"
     print(f"    → {status}")
 
-    # 8: CFTC COT - Bitcoin Financial Futures
+    # 8: CFTC COT - Bitcoin Traders in Financial Futures
     print("  Fetching CFTC COT (Bitcoin)...")
     cot_url = (
-        "https://publicreporting.cftc.gov/resource/72hh-3qpy.json"
+        "https://publicreporting.cftc.gov/resource/gpe5-46if.json"
         "?commodity_name=BITCOIN"
         "&$limit=4&$order=report_date_as_yyyy_mm_dd%20DESC"
     )
@@ -322,23 +322,27 @@ def aggregate_data(data: dict, history: list | None = None) -> str:
         lines.append(f"  Remaining Blocks: {diff.get('remainingBlocks', 'N/A')}")
     lines.append("")
 
-    # CFTC COT Positioning
+    # CFTC COT Positioning (Traders in Financial Futures)
     cot = data.get("cot", [])
-    lines.append("=== CFTC COT POSITIONING (Bitcoin Financial Futures) ===")
+    lines.append("=== CFTC COT POSITIONING (Bitcoin Traders in Financial Futures) ===")
     if cot:
         latest = cot[0]
         lines.append(f"  Report Date: {latest.get('report_date_as_yyyy_mm_dd', 'N/A')}")
-        lines.append(f"  Non-Commercial Long: {latest.get('noncomm_positions_long_all', 'N/A')}")
-        lines.append(f"  Non-Commercial Short: {latest.get('noncomm_positions_short_all', 'N/A')}")
-        lines.append(f"  Commercial Long: {latest.get('comm_positions_long_all', 'N/A')}")
-        lines.append(f"  Commercial Short: {latest.get('comm_positions_short_all', 'N/A')}")
+        lines.append(f"  Asset Manager Long: {latest.get('asset_mgr_positions_long', 'N/A')}")
+        lines.append(f"  Asset Manager Short: {latest.get('asset_mgr_positions_short', 'N/A')}")
+        lines.append(f"  Leveraged Money Long: {latest.get('lev_money_positions_long', 'N/A')}")
+        lines.append(f"  Leveraged Money Short: {latest.get('lev_money_positions_short', 'N/A')}")
+        lines.append(f"  Dealer Long: {latest.get('dealer_positions_long_all', 'N/A')}")
+        lines.append(f"  Dealer Short: {latest.get('dealer_positions_short_all', 'N/A')}")
         lines.append(f"  Open Interest: {latest.get('open_interest_all', 'N/A')}")
 
         if len(cot) >= 2:
             prev = cot[1]
             lines.append(f"  Previous Week ({prev.get('report_date_as_yyyy_mm_dd', '?')}):")
-            lines.append(f"    Non-Comm Long: {prev.get('noncomm_positions_long_all', 'N/A')}")
-            lines.append(f"    Non-Comm Short: {prev.get('noncomm_positions_short_all', 'N/A')}")
+            lines.append(f"    Asset Mgr Long: {prev.get('asset_mgr_positions_long', 'N/A')}")
+            lines.append(f"    Asset Mgr Short: {prev.get('asset_mgr_positions_short', 'N/A')}")
+            lines.append(f"    Lev Money Long: {prev.get('lev_money_positions_long', 'N/A')}")
+            lines.append(f"    Lev Money Short: {prev.get('lev_money_positions_short', 'N/A')}")
             lines.append(f"    Open Interest: {prev.get('open_interest_all', 'N/A')}")
     else:
         lines.append("  COT data: N/A (CFTC API may be unavailable)")
@@ -828,8 +832,8 @@ def save_daily_snapshot(data: dict, recommendation: str = "PENDING"):
         "fng": fng_val,
         "hash_eh": round(hash_eh, 2) if hash_eh else None,
         "cot_net_spec": _safe_int(
-            cot_latest.get("noncomm_positions_long_all"),
-            cot_latest.get("noncomm_positions_short_all"),
+            cot_latest.get("asset_mgr_positions_long"),
+            cot_latest.get("asset_mgr_positions_short"),
         ),
         "cot_oi": _safe_float(cot_latest.get("open_interest_all")),
         "etf_flow_m": etf_daily_m,
