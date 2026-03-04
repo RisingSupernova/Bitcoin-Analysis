@@ -14,6 +14,7 @@ Data sources:
   7. Mempool      - Difficulty adjustment
   8. CFTC COT     - Bitcoin futures positioning (Financial Futures)
   9. Blockchain   - Hash rate backup (30 days)
+ 10. SoSoValue   - Spot BTC ETF flows (daily + historical)
 
 Secrets required (set in GitHub repo settings):
   ANTHROPIC_API_KEY  - Claude API key
@@ -72,6 +73,25 @@ def http_get(url: str, headers: dict | None = None, timeout: int = 30) -> dict |
         return {}
 
 
+def http_post(url: str, body: dict, headers: dict | None = None, timeout: int = 30) -> dict | str:
+    """Simple HTTP POST with JSON body. Returns parsed JSON or raw text."""
+    data = json.dumps(body).encode("utf-8")
+    hdrs = {"Content-Type": "application/json", "User-Agent": "BTC-Analyst/1.0"}
+    if headers:
+        hdrs.update(headers)
+    req = Request(url, data=data, headers=hdrs, method="POST")
+    try:
+        with urlopen(req, timeout=timeout) as resp:
+            raw = resp.read().decode("utf-8")
+            try:
+                return json.loads(raw)
+            except json.JSONDecodeError:
+                return raw
+    except (URLError, HTTPError) as e:
+        print(f"  ⚠ HTTP error for {url[:80]}: {e}")
+        return {}
+
+
 def fetch_fred(series_id: str) -> dict:
     """Fetch latest FRED observation, skipping missing '.' values."""
     url = (
@@ -92,7 +112,7 @@ def fetch_fred(series_id: str) -> dict:
 # ---------------------------------------------------------------------------
 def fetch_all_data() -> dict:
     """Fetch all 9 data sources, returning structured dict."""
-    print("📡 Fetching data from 9 sources...")
+    print("📡 Fetching data from 10 sources...")
 
     results = {}
 
@@ -161,6 +181,27 @@ def fetch_all_data() -> dict:
     if values:
         latest_h = values[-1].get("y", 0)
         print(f"    → OK: {latest_h / 1e9:.2f} EH/s")
+    else:
+        print("    → MISSING")
+
+    # 10: SoSoValue Spot BTC ETF flows
+    print("  Fetching SoSoValue ETF flows...")
+    etf_current = http_post(
+        "https://api.sosovalue.xyz/openapi/v2/etf/currentEtfDataMetrics",
+        {"type": "us-btc-spot"},
+    )
+    etf_history = http_post(
+        "https://api.sosovalue.xyz/openapi/v2/etf/historicalInflowChart",
+        {"type": "us-btc-spot"},
+    )
+    results["etf_current"] = etf_current if isinstance(etf_current, dict) and etf_current.get("code") == 0 else {}
+    etf_hist_data = etf_history.get("data", []) if isinstance(etf_history, dict) and etf_history.get("code") == 0 else []
+    results["etf_history"] = etf_hist_data
+    if results["etf_current"].get("data"):
+        daily = results["etf_current"]["data"].get("dailyNetInflow", {})
+        val = _safe_float(daily.get("value"))
+        date = daily.get("lastUpdateDate", "?")
+        print(f"    → OK: Daily net inflow ${val / 1e6:+.1f}M ({date})" if val is not None else "    → MISSING")
     else:
         print("    → MISSING")
 
@@ -303,6 +344,60 @@ def aggregate_data(data: dict, history: list | None = None) -> str:
         lines.append("  COT data: N/A (CFTC API may be unavailable)")
     lines.append("")
 
+    # ETF Flows (SoSoValue)
+    etf_cur = data.get("etf_current", {}).get("data", {})
+    etf_hist = data.get("etf_history", [])
+    lines.append("=== SPOT BTC ETF FLOWS (SoSoValue) ===")
+    if etf_cur:
+        daily_inflow = _safe_float(etf_cur.get("dailyNetInflow", {}).get("value"))
+        daily_date = etf_cur.get("dailyNetInflow", {}).get("lastUpdateDate", "N/A")
+        cum_inflow = _safe_float(etf_cur.get("cumNetInflow", {}).get("value"))
+        total_aum = _safe_float(etf_cur.get("totalNetAssets", {}).get("value"))
+        total_btc = _safe_float(etf_cur.get("totalTokenHoldings", {}).get("value"))
+        daily_vol = _safe_float(etf_cur.get("dailyTotalValueTraded", {}).get("value"))
+
+        lines.append(f"  Daily Net Inflow: ${daily_inflow / 1e6:+,.1f}M ({daily_date})" if daily_inflow is not None else "  Daily Net Inflow: N/A")
+        lines.append(f"  Cumulative Net Inflow: ${cum_inflow / 1e9:,.2f}B" if cum_inflow is not None else "  Cumulative Net Inflow: N/A")
+        lines.append(f"  Total AUM: ${total_aum / 1e9:,.2f}B" if total_aum is not None else "  Total AUM: N/A")
+        lines.append(f"  Total BTC Holdings: {total_btc:,.0f} BTC" if total_btc is not None else "  Total BTC Holdings: N/A")
+        lines.append(f"  Daily Volume: ${daily_vol / 1e9:,.2f}B" if daily_vol is not None else "  Daily Volume: N/A")
+
+        # Top ETF breakdown
+        etf_list = etf_cur.get("list", [])
+        if etf_list:
+            lines.append("  --- Per-ETF Breakdown (top 5 by AUM) ---")
+            sorted_etfs = sorted(etf_list, key=lambda e: abs(_safe_float(e.get("netAssets", {}).get("value")) or 0), reverse=True)
+            for etf in sorted_etfs[:5]:
+                ticker = etf.get("ticker", "?")
+                inst = etf.get("institute", "?").strip()
+                etf_daily = _safe_float(etf.get("dailyNetInflow", {}).get("value"))
+                etf_aum = _safe_float(etf.get("netAssets", {}).get("value"))
+                daily_str = f"${etf_daily / 1e6:+,.1f}M" if etf_daily is not None else "N/A"
+                aum_str = f"${etf_aum / 1e9:,.2f}B" if etf_aum is not None else "N/A"
+                lines.append(f"    {ticker} ({inst}): Daily {daily_str}, AUM {aum_str}")
+    else:
+        lines.append("  ETF data: N/A (SoSoValue API may be unavailable)")
+
+    # Historical ETF flow summary (7d and 30d)
+    if etf_hist:
+        recent_7 = etf_hist[:7]
+        recent_30 = etf_hist[:30]
+        sum_7d = sum(_safe_float(d.get("totalNetInflow")) or 0 for d in recent_7)
+        sum_30d = sum(_safe_float(d.get("totalNetInflow")) or 0 for d in recent_30)
+        inflow_days_7 = sum(1 for d in recent_7 if (_safe_float(d.get("totalNetInflow")) or 0) > 0)
+        outflow_days_7 = sum(1 for d in recent_7 if (_safe_float(d.get("totalNetInflow")) or 0) < 0)
+        lines.append(f"  7-Day Net Flow: ${sum_7d / 1e6:+,.1f}M ({inflow_days_7} inflow days, {outflow_days_7} outflow days)")
+        lines.append(f"  30-Day Net Flow: ${sum_30d / 1e6:+,.1f}M")
+
+        # Last 7 days detail
+        lines.append("  --- Last 7 Trading Days ---")
+        for d in recent_7:
+            date = d.get("date", "?")
+            flow = _safe_float(d.get("totalNetInflow"))
+            flow_str = f"${flow / 1e6:+,.1f}M" if flow is not None else "N/A"
+            lines.append(f"    {date}: {flow_str}")
+    lines.append("")
+
     # Data quality summary
     source_checks = {
         "FRED DFII10": bool(data.get("dfii10", {}).get("value")),
@@ -314,6 +409,7 @@ def aggregate_data(data: dict, history: list | None = None) -> str:
         "Mempool Diff": bool(diff.get("progressPercent")),
         "CFTC COT": bool(cot),
         "Blockchain Hash": bool(bc_values),
+        "SoSoValue ETF": bool(etf_cur),
     }
     lines.append("=== DATA QUALITY FLAGS ===")
     for src, ok in source_checks.items():
@@ -621,7 +717,7 @@ def parse_response(claude_response: dict, previous_rec: str) -> dict:
         f"Score: {composite:.2f} | Target: {btc_alloc}% BTC / {stable_alloc}% Stable"
     )
 
-    subject = f"₿ Bitcoin Report - {datetime.now(timezone.utc).strftime('%Y-%m-%d')} | {action} | {conviction}"
+    subject = f"Bitcoin Report - {datetime.now(timezone.utc).strftime('%d-%m-%Y')} | {action} | {conviction} CONVICTION"
 
     return {
         "html_report": html_report,
@@ -719,6 +815,9 @@ def save_daily_snapshot(data: dict, recommendation: str = "PENDING"):
     hash_eh = bc_values[-1].get("y", 0) / 1e9 if bc_values else None
     cot = data.get("cot", [])
     cot_latest = cot[0] if cot else {}
+    etf_cur = data.get("etf_current", {}).get("data", {})
+    etf_daily_raw = _safe_float(etf_cur.get("dailyNetInflow", {}).get("value"))
+    etf_daily_m = round(etf_daily_raw / 1e6, 1) if etf_daily_raw is not None else None
 
     snapshot = {
         "date": today,
@@ -733,6 +832,7 @@ def save_daily_snapshot(data: dict, recommendation: str = "PENDING"):
             cot_latest.get("noncomm_positions_short_all"),
         ),
         "cot_oi": _safe_float(cot_latest.get("open_interest_all")),
+        "etf_flow_m": etf_daily_m,
         "recommendation": recommendation,
     }
 
@@ -754,8 +854,8 @@ def format_history_for_prompt(history: list) -> str:
         "",
         "=== ROLLING DATA HISTORY (last {} days, for trend analysis) ===".format(len(history)),
         "",
-        "Date       | BTC($)  | Real10Y | DXY    | VIX   | F&G | Hash(EH) | NetSpec | OI     | Rec",
-        "-----------|---------|---------|--------|-------|-----|----------|---------|--------|----",
+        "Date       | BTC($)  | Real10Y | DXY    | VIX   | F&G | Hash(EH) | NetSpec | OI     | ETF$M  | Rec",
+        "-----------|---------|---------|--------|-------|-----|----------|---------|--------|--------|----",
     ]
 
     for h in history:
@@ -767,16 +867,18 @@ def format_history_for_prompt(history: list) -> str:
         hsh = f"{h.get('hash_eh', 0):>8.2f}" if h.get("hash_eh") is not None else "     N/A"
         net = f"{h.get('cot_net_spec', 0):>7d}" if h.get("cot_net_spec") is not None else "    N/A"
         oi = f"{h.get('cot_oi', 0):>6.0f}" if h.get("cot_oi") is not None else "   N/A"
+        etf = f"{h.get('etf_flow_m', 0):>+6.0f}" if h.get("etf_flow_m") is not None else "   N/A"
         rec = h.get("recommendation", "?")[:4]
 
         lines.append(
-            f"{h.get('date', '?'):10s} | {btc} | {dfii} | {dxy} | {vix} | {fng} | {hsh} | {net} | {oi} | {rec}"
+            f"{h.get('date', '?'):10s} | {btc} | {dfii} | {dxy} | {vix} | {fng} | {hsh} | {net} | {oi} | {etf} | {rec}"
         )
 
     lines.append("")
     lines.append("KEY: F&G = Fear & Greed (0=Extreme Fear, 100=Extreme Greed)")
     lines.append("     NetSpec = Non-Commercial Longs minus Shorts | OI = Open Interest")
     lines.append("     Hash(EH) = Hash Rate in Exahash/s")
+    lines.append("     ETF$M = Daily Spot BTC ETF Net Flow in USD Millions")
     lines.append("")
     lines.append("USE THIS HISTORY TO: identify trends in price momentum, macro conditions,")
     lines.append("sentiment shifts, hash rate growth, and positioning changes.")
@@ -852,7 +954,7 @@ def main():
     # Check data quality
     missing_count = data_text.count("MISSING")
     ok_count = data_text.count(": OK")
-    print(f"  Data quality: {ok_count}/9 OK, {missing_count}/9 MISSING")
+    print(f"  Data quality: {ok_count}/10 OK, {missing_count}/10 MISSING")
     if missing_count > 5:
         print("  ⚠ WARNING: Most data sources failed. Report will rely on estimates.")
 
@@ -888,7 +990,7 @@ def main():
             f.write(f"**{result['alert_message']}**\n\n")
             if result.get("recommendation_changed"):
                 f.write(f"⚡ Changed from `{prev_rec}` → `{result['recommendation']}`\n\n")
-            f.write(f"Data quality: {ok_count}/9 sources OK\n")
+            f.write(f"Data quality: {ok_count}/10 sources OK\n")
 
     print("\n✅ Done!")
 

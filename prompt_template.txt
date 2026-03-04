@@ -15,10 +15,10 @@ IMPORTANT: The data above came from live API feeds. Use these EXACT numbers in y
 You will simulate 5 specialist agents, then synthesize their outputs as CIO Orchestrator.
 
 ### STEP 1: Web Search
-Search for 2-3 queries to capture current market conditions:
+Search for 1-2 queries to capture current market conditions:
 - "bitcoin price news today"
-- "bitcoin ETF flows farside" (for ETF flow data from Farside Investors)
 - "bitcoin mining hash rate difficulty"
+Note: ETF flow data is already provided as hard data from SoSoValue API — do NOT search for ETF flows.
 
 ### STEP 2: Run Each Specialist Agent
 
@@ -44,19 +44,19 @@ Search for 2-3 queries to capture current market conditions:
 - Output: direction, confidence
 
 **Agent 4: ETF Flow Analyst**
-- Analyze: Spot BTC ETF flows from web search (Farside Investors data)
-- Data source: Search "bitcoin ETF flows farside" for recent flow data
-- CRITICAL: Extract and report ACTUAL NUMBERS from search results:
-  - Look for daily flow figures in USD millions (e.g., "-$500M", "+$200M")
-  - Calculate approximate 7-day and 30-day net flows if data available
-  - Report the actual numbers found, not vague descriptions
-- Signal interpretation based on flows found:
+- Analyze: Spot BTC ETF flows from HARD DATA above (SoSoValue API)
+- Data: Use the "SPOT BTC ETF FLOWS" section from hard data — daily net inflow, 7-day and 30-day net flows, per-ETF breakdown, and last 7 trading days detail
+- CRITICAL: Use the EXACT numbers from hard data. Do NOT estimate or use web search for ETF flows.
+- Signal interpretation based on hard data flows:
   - Daily inflow >$200M: BULLISH, confidence 75
   - Daily inflow $0-$200M: BULLISH, confidence 60
   - Daily outflow $0 to -$200M: BEARISH, confidence 60
   - Daily outflow >$200M: BEARISH, confidence 75
-  - If no recent data found: NEUTRAL, confidence 40
-- key_observation: MUST include actual flow numbers (e.g., "Daily: -$509M, 7D: -$2.1B")
+  - If ETF data is N/A: NEUTRAL, confidence 40
+- Also consider the 7-day and 30-day flow trends for conviction:
+  - 7D net positive AND daily positive: increase confidence by 10
+  - 7D and daily direction diverge: reduce confidence by 10
+- key_observation: MUST include actual flow numbers from hard data (e.g., "Daily: +$225.2M, 7D: +$1.67B, IBIT: +$322.4M")
 - NEVER claim "institutional demand returning" if recent flows show NET OUTFLOWS
 - NEVER use vague phrases like "strong institutional interest" without citing actual inflow numbers
 
