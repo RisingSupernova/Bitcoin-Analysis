@@ -52,6 +52,22 @@ Pure Python computation (no pip dependencies) of:
 - **Preamble Stripping**: Clean HTML output, no AI "thinking out loud"
 - **Graceful Degradation**: Missing data sources default to NEUTRAL signals
 
+## Twitter/X Automation
+
+After generating the report, the pipeline automatically posts a 2-tweet thread:
+
+1. **Tweet 1**: Report subject + header card screenshot (native Twitter media)
+2. **Tweet 2** (reply): Link to full-resolution report screenshot on imgBB
+
+Components:
+- `header_template.html` — Dark gradient card template (Playwright renders at 2x for crisp output)
+- `twitter_poster.py` — Screenshots, imgBB upload, Twitter thread posting
+- `retweet.py` — Automated retweet 12 hours later for additional reach
+
+Flags: `--dry-run` (screenshots only), `--force` (bypass duplicate guard)
+
+**Note**: Requires X API Basic tier ($100/mo) — Free tier does not support tweet creation.
+
 ## Setup
 
 ### 1. Create GitHub Repository
@@ -68,6 +84,11 @@ Go to **Settings → Secrets and variables → Actions** and add:
 | `FRED_API_KEY` | [FRED API key](https://fred.stlouisfed.org/docs/api/api_key.html) |
 | `GMAIL_ADDRESS` | Gmail address (sender + recipient) |
 | `GMAIL_APP_PASSWORD` | [Gmail App Password](https://myaccount.google.com/apppasswords) |
+| `TWITTER_API_KEY` | X Developer Portal → Consumer Key |
+| `TWITTER_API_SECRET` | X Developer Portal → Consumer Key Secret |
+| `TWITTER_ACCESS_TOKEN` | X Developer Portal → Access Token (Read+Write) |
+| `TWITTER_ACCESS_SECRET` | X Developer Portal → Access Token Secret |
+| `IMGBB_API_KEY` | [imgBB API key](https://api.imgbb.com/) |
 
 ### 3. Run
 
@@ -80,16 +101,24 @@ Cron: `0 4 * * 1-5` (04:00 UTC)
 - Summer (CEST): 06:00 Malta
 - Winter (CET): 05:00 Malta
 
+Retweet: `0 16 * * 1-5` (16:00 UTC, 12hrs after report)
+
 ## File Structure
 
 ```
 ├── btc_analyst.py              # Main script (stdlib only, no pip)
 ├── prompt_template.txt         # Claude analysis prompt (6-agent framework)
+├── twitter_poster.py           # Twitter/X posting automation
+├── header_template.html        # Header card template for screenshots
+├── retweet.py                  # 12hr retweet automation
 ├── .github/workflows/
-│   └── btc_analyst.yml         # GitHub Actions workflow
+│   ├── btc_analyst.yml         # Main workflow (report + tweet)
+│   └── retweet.yml             # Retweet workflow
 ├── data/
 │   ├── previous_recommendation.json
 │   ├── history.json            # 45-day rolling data
-│   └── report_YYYYMMDD.html   # Saved reports (if email fails)
+│   ├── report_YYYYMMDD.html    # Full HTML reports
+│   ├── twitter_meta_YYYYMMDD.json   # Tweet metadata
+│   └── twitter_posted_YYYYMMDD.json # Idempotency guard
 └── README.md
 ```
