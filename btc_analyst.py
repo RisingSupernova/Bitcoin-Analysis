@@ -1295,6 +1295,25 @@ def main():
     save_recommendation(result)
     save_daily_snapshot(data, result["recommendation"])
 
+    # 6b. Save report artifacts for Twitter poster
+    date_str = datetime.now(timezone.utc).strftime('%Y%m%d')
+    report_file = DATA_DIR / f"report_{date_str}.html"
+    report_file.write_text(result["html_report"])
+    print(f"  📄 Report saved to {report_file}")
+    twitter_meta = {
+        "email_subject": result["email_subject"],
+        "recommendation": result["recommendation"],
+        "conviction": result["conviction"],
+        "confidence": result["confidence"],
+        "composite_score": result["composite_score"],
+        "market_regime": result["market_regime"],
+        "cycle_phase": result["cycle_phase"],
+        "btc_allocation_pct": result["btc_allocation_pct"],
+        "stablecoin_allocation_pct": result["stablecoin_allocation_pct"],
+        "date": date_str,
+    }
+    (DATA_DIR / f"twitter_meta_{date_str}.json").write_text(json.dumps(twitter_meta, indent=2))
+
     # 7. Send email
     send_email(result)
 

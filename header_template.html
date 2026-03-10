@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=600">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 600px;
+    height: 315px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 40%, #1a1a2e 100%);
+    color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .card {
+    width: 540px;
+    padding: 32px 36px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+    backdrop-filter: blur(10px);
+  }
+
+  .subtitle {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #d4a853;
+    margin-bottom: 12px;
+  }
+
+  .subtitle::before {
+    content: "\2666";
+    margin-right: 8px;
+    font-size: 10px;
+  }
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+
+  .date-line {
+    font-size: 14px;
+    color: #9ca3af;
+    margin-bottom: 20px;
+  }
+
+  .badges {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* Regime badges */
+  .badge-bear {
+    background: #dc2626;
+    color: #ffffff;
+  }
+  .badge-bull {
+    background: #16a34a;
+    color: #ffffff;
+  }
+  .badge-accumulation {
+    background: #d97706;
+    color: #ffffff;
+  }
+  .badge-unknown {
+    background: #6b7280;
+    color: #ffffff;
+  }
+
+  /* Cycle badges */
+  .badge-early-bear {
+    background: #ea580c;
+    color: #ffffff;
+  }
+  .badge-late-bear {
+    background: #dc2626;
+    color: #ffffff;
+  }
+  .badge-early-bull {
+    background: #059669;
+    color: #ffffff;
+  }
+  .badge-mid-bull {
+    background: #16a34a;
+    color: #ffffff;
+  }
+  .badge-late-bull {
+    background: #d97706;
+    color: #ffffff;
+  }
+
+  /* Action badges */
+  .badge-strong-buy, .badge-buy {
+    background: #16a34a;
+    color: #ffffff;
+  }
+  .badge-accumulate {
+    background: #d97706;
+    color: #ffffff;
+  }
+  .badge-hold {
+    background: #6b7280;
+    color: #ffffff;
+  }
+  .badge-reduce {
+    background: #ea580c;
+    color: #ffffff;
+  }
+  .badge-sell, .badge-strong-sell {
+    background: #dc2626;
+    color: #ffffff;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="subtitle">CIO Orchestrator &mdash; Position Trading System</div>
+    <h1>BTC Daily Allocation<br>Report</h1>
+    <div class="date-line">{{DATE}} &nbsp;|&nbsp; All data API-sourced</div>
+    <div class="badges">
+      <span class="badge {{REGIME_CLASS}}">Market Regime: {{REGIME}}</span>
+      <span class="badge {{CYCLE_CLASS}}">Cycle: {{CYCLE_PHASE}}</span>
+    </div>
+  </div>
+</body>
+</html>

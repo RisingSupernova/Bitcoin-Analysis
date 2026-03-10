@@ -1,0 +1,44 @@
+name: Retweet Daily Report
+
+on:
+  schedule:
+    # 16:00 UTC = 12 hours after the 04:00 UTC report
+    - cron: '0 16 * * 1-5'
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  contents: write # Needed to update guard file
+
+jobs:
+  retweet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install tweepy
+
+      - name: Retweet latest report
+        env:
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: python retweet.py
+        continue-on-error: true
+
+      - name: Commit guard file update
+        run: |
+          git config user.name "BTC Analyst Bot"
+          git config user.email "bot@btc-analyst.local"
+          git add data/twitter_posted_*.json || true
+          git commit -m "🔁 Retweeted daily report $(date +%Y-%m-%d)" || echo "No changes to commit"
+          git push || echo "Push failed"

@@ -31,11 +31,24 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python btc_analyst.py
 
+      - name: Install Twitter poster dependencies
+        run: pip install tweepy requests playwright && playwright install chromium --with-deps
+
+      - name: Post to Twitter
+        env:
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+          IMGBB_API_KEY: ${{ secrets.IMGBB_API_KEY }}
+        run: python twitter_poster.py
+        continue-on-error: true
+
       - name: Commit data
         run: |
           git config user.name "BTC Analyst Bot"
           git config user.email "bot@btc-analyst.local"
-          git add data/previous_recommendation.json data/history.json data/report_*.html || true
+          git add data/previous_recommendation.json data/history.json data/report_*.html data/twitter_meta_*.json data/twitter_posted_*.json || true
           RECOMMENDATION=$(python -c "import json; d=json.load(open('data/previous_recommendation.json')); print(d.get('recommendation','UNKNOWN'))" 2>/dev/null || echo "UNKNOWN")
           git commit -m "₿ BTC report $(date +%Y-%m-%d) — $RECOMMENDATION" || echo "No changes to commit"
           git push || echo "Push failed"
