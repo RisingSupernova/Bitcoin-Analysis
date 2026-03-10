@@ -12,7 +12,7 @@ IMPORTANT: The data above came from live API feeds. Use these EXACT numbers in y
 
 ## MULTI-AGENT ANALYSIS FRAMEWORK
 
-You will simulate 5 specialist agents, then synthesize their outputs as CIO Orchestrator.
+You will simulate 6 specialist agents, then synthesize their outputs as CIO Orchestrator.
 
 ### STEP 1: Web Search
 Search for 1-2 queries to capture current market conditions:
@@ -69,16 +69,33 @@ Note: ETF flow data is already provided as hard data from SoSoValue API — do N
 - Signal: Is speculative positioning crowded? Net long or short change?
 - Output: direction, confidence
 
+**Agent 6: Technical Analyst**
+- Analyze: Trend direction, momentum, volatility regime from TECHNICAL INDICATORS section
+- Data: Pre-computed indicators across 3 timeframes (daily, 4H, weekly) in "TECHNICAL INDICATORS (BTCUSDT)" section
+- IMPORTANT: Do NOT repeat signals already captured by other agents. CoinGecko price changes (Agent 2) and Fear & Greed (Agent 5) already reflect momentum and sentiment. Focus on what only TA provides: EMA structure, RSI extremes, MACD trend shifts, and Bollinger squeeze/expansion.
+- Signal interpretation:
+  - EMA stack bullish + slope positive: BULLISH, confidence 70
+  - EMA stack bullish + slope flat/negative: NEUTRAL, confidence 55 (trend weakening)
+  - EMA stack bearish + slope negative: BEARISH, confidence 70
+  - RSI > 70 + MACD histogram contracting: overbought divergence, reduce confidence 10
+  - RSI < 30 + MACD histogram expanding: oversold bounce potential, increase confidence 10
+  - Bollinger squeeze detected: flag directional move imminent, +5 confidence
+  - MTF all 3 aligned: +10 confidence
+  - MTF divergence (timeframes disagree): -10 confidence
+  - If technical data is UNAVAILABLE: NEUTRAL, confidence 30, redistribute this agent's weight to remaining 5 agents
+- key_observation: MUST cite specific indicator values (e.g., "Daily RSI 62, EMA bullish stack, slope +1.2%/bar, MACD expanding. BB width 10.6% (no squeeze). 4H confirms.")
+- Output: direction, confidence
+
 ### STEP 3: Use Hard Data Market Regime (DO NOT OVERRIDE)
 
 The market regime is ALREADY calculated in HARD DATA based on days since halving.
 You MUST use cycle.estimated_phase directly as market_regime:
 
-- If cycle.estimated_phase = EARLY_BULL → market_regime = EARLY_BULL, weights: On-Chain 25%, Mining 20%, Macro 20%, ETF 20%, Derivatives 15%
-- If cycle.estimated_phase = MID_BULL → market_regime = LATE_BULL, weights: On-Chain 20%, Derivatives 25%, Macro 20%, ETF 20%, Mining 15%
-- If cycle.estimated_phase = LATE_BULL → market_regime = LATE_BULL, weights: On-Chain 20%, Derivatives 25%, Macro 20%, ETF 20%, Mining 15%
-- If cycle.estimated_phase = EARLY_BEAR → market_regime = BEAR, weights: Macro 25%, On-Chain 20%, Mining 20%, Derivatives 20%, ETF 15%
-- If cycle.estimated_phase = LATE_BEAR → market_regime = ACCUMULATION, weights: On-Chain 25%, Mining 25%, Macro 15%, ETF 20%, Derivatives 15%
+- If cycle.estimated_phase = EARLY_BULL → market_regime = EARLY_BULL, weights: On-Chain 20%, Mining 15%, Macro 15%, ETF 15%, Derivatives 15%, Technical 20%
+- If cycle.estimated_phase = MID_BULL → market_regime = LATE_BULL, weights: On-Chain 15%, Mining 10%, Macro 20%, ETF 15%, Derivatives 20%, Technical 20%
+- If cycle.estimated_phase = LATE_BULL → market_regime = LATE_BULL, weights: On-Chain 15%, Mining 10%, Macro 20%, ETF 15%, Derivatives 20%, Technical 20%
+- If cycle.estimated_phase = EARLY_BEAR → market_regime = BEAR, weights: On-Chain 15%, Mining 15%, Macro 20%, ETF 10%, Derivatives 20%, Technical 20%
+- If cycle.estimated_phase = LATE_BEAR → market_regime = ACCUMULATION, weights: On-Chain 20%, Mining 15%, Macro 10%, ETF 15%, Derivatives 15%, Technical 25%
 
 DO NOT recalculate regime based on agent sentiment. The cycle phase is calculated from halving date (April 19, 2024) and is authoritative.
 If agent signals CONTRADICT the hard data phase, document in conflicts_noted but DO NOT change market_regime.
@@ -92,9 +109,12 @@ Sum all = composite_score (-1.0 to +1.0)
 ### STEP 5: Apply Confidence Modifiers
 
 Start with average confidence, then:
-- All 5 aligned: +15%
-- 4 of 5 aligned: +5%
+- All 6 aligned: +15%
+- 5 of 6 aligned: +10%
+- 4 of 6 aligned: +5%
 - Conflicting macro vs on-chain: -15%
+- Technical confirms macro direction: +5% (cross-validation bonus)
+- Technical diverges from all other agents: -10% (potential leading indicator, flag in conflicts)
 - Stale COT data (>7 days): -10%
 - Extreme Fear/Greed reading: +10% (contrarian signal strength)
 
@@ -149,16 +169,17 @@ Gmail strips most CSS. You MUST follow these rules:
 5. **Key Market Data Cards** - Stacked rows: BTC price, 24h/7d/30d change, DXY, Real rates, VIX, Market cap
 6. **Sentiment Card** - Fear & Greed current value, classification, 7-day average
 7. **Mining Card** - Hash rate, 30d change, difficulty progress, next retarget
-8. **Agent Signals** - 5 stacked cards (one per agent: direction, confidence, key observation)
-9. **Composite Score** - Show the calculation breakdown
+8. **Agent Signals** - 6 stacked cards (one per agent: direction, confidence, key observation). Include Technical Analyst card with trend direction and key indicator values.
+9. **Composite Score** - Show the calculation breakdown (6 agents)
 10. **Recommendation Box** - Large, prominent, colored by signal (green=buy, amber=hold, red=sell)
 11. **Position Guidance** - % BTC vs % Stablecoins, entry method
-12. **Bullish Drivers** - Green left-border card
-13. **Risk Factors** - Red left-border card
-14. **Catalyst Calendar** - Stacked date/event items
-15. **Conflicts** - Note any unresolved agent disagreements
+12. **Key Technical Levels** - Support/resistance levels from EMAs and Bollinger Bands, color-coded green (support) / red (resistance)
+13. **Bullish Drivers** - Green left-border card
+14. **Risk Factors** - Red left-border card
+15. **Catalyst Calendar** - Stacked date/event items
+16. **Conflicts** - Note any unresolved agent disagreements
 
 IMMEDIATELY AFTER the closing </html> tag, output this JSON block:
 ```json
-{"timestamp": "ISO8601", "asset": "BTC", "market_regime": "EARLY_BULL|LATE_BULL|BEAR|ACCUMULATION", "cycle_phase": {"days_since_halving": "<USE_cycle.days_since_halving_FROM_HARD_DATA>", "estimated_phase": "<USE_cycle.estimated_phase_FROM_HARD_DATA>"}, "btc_recommendation": {"action": "STRONG_BUY|BUY|ACCUMULATE|HOLD|REDUCE|SELL|STRONG_SELL", "conviction": "HIGH|MEDIUM|LOW", "confidence_pct": 75, "composite_score": 0.42}, "position_guidance": {"btc_allocation_pct": 80.0, "stablecoin_allocation_pct": 20.0, "entry_method": "IMMEDIATE|DCA_2WK|DCA_4WK", "sizing_rationale": "string"}, "agent_signals": {"macro": {"direction": "string", "confidence": 85, "key_observation": "string"}, "on_chain": {"direction": "string", "confidence": 70, "key_observation": "string"}, "mining": {"direction": "string", "confidence": 60, "key_observation": "string"}, "etf_flows": {"direction": "string", "confidence": 80, "key_observation": "string"}, "derivatives": {"direction": "string", "confidence": 55, "key_observation": "string"}}, "key_drivers": ["array"], "key_risks": ["array"], "catalyst_calendar": [{"date": "YYYY-MM-DD", "event": "string", "impact": "HIGH|MEDIUM|LOW"}], "conflicts_noted": "string or null", "confidence_modifiers_applied": ["list"], "next_review": "ISO8601"}
+{"timestamp": "ISO8601", "asset": "BTC", "market_regime": "EARLY_BULL|LATE_BULL|BEAR|ACCUMULATION", "cycle_phase": {"days_since_halving": "<USE_cycle.days_since_halving_FROM_HARD_DATA>", "estimated_phase": "<USE_cycle.estimated_phase_FROM_HARD_DATA>"}, "btc_recommendation": {"action": "STRONG_BUY|BUY|ACCUMULATE|HOLD|REDUCE|SELL|STRONG_SELL", "conviction": "HIGH|MEDIUM|LOW", "confidence_pct": 75, "composite_score": 0.42}, "position_guidance": {"btc_allocation_pct": 80.0, "stablecoin_allocation_pct": 20.0, "entry_method": "IMMEDIATE|DCA_2WK|DCA_4WK", "sizing_rationale": "string"}, "agent_signals": {"macro": {"direction": "string", "confidence": 85, "key_observation": "string"}, "on_chain": {"direction": "string", "confidence": 70, "key_observation": "string"}, "mining": {"direction": "string", "confidence": 60, "key_observation": "string"}, "etf_flows": {"direction": "string", "confidence": 80, "key_observation": "string"}, "derivatives": {"direction": "string", "confidence": 55, "key_observation": "string"}, "technical": {"direction": "string", "confidence": 70, "key_observation": "string"}}, "key_drivers": ["array"], "key_risks": ["array"], "catalyst_calendar": [{"date": "YYYY-MM-DD", "event": "string", "impact": "HIGH|MEDIUM|LOW"}], "conflicts_noted": "string or null", "confidence_modifiers_applied": ["list"], "next_review": "ISO8601"}
 ```

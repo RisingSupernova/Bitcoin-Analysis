@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Bitcoin Analyst Daily Report - GitHub Actions Version
-Fetches market data from 9 API sources, runs multi-agent analysis via Claude,
+Fetches market data from 12 API sources, runs multi-agent analysis via Claude,
 and emails an HTML report with BTC allocation recommendation.
 
 Data sources:
@@ -15,6 +15,8 @@ Data sources:
   8. CFTC COT     - Bitcoin futures positioning (Financial Futures)
   9. Blockchain   - Hash rate backup (30 days)
  10. SoSoValue   - Spot BTC ETF flows (daily + historical)
+ 11. CryptoCompare - BTC OHLCV daily candles (365 bars, for technical indicators)
+ 12. CryptoCompare - BTC OHLCV 4-hour candles (200 bars, for technical indicators)
 
 Secrets required (set in GitHub repo settings):
   ANTHROPIC_API_KEY  - Claude API key
@@ -24,6 +26,7 @@ Secrets required (set in GitHub repo settings):
 """
 
 import json
+import math
 import os
 import re
 import smtplib
@@ -112,7 +115,7 @@ def fetch_fred(series_id: str) -> dict:
 # ---------------------------------------------------------------------------
 def fetch_all_data() -> dict:
     """Fetch all 9 data sources, returning structured dict."""
-    print("📡 Fetching data from 10 sources...")
+    print("📡 Fetching data from 12 sources...")
 
     results = {}
 
@@ -204,6 +207,31 @@ def fetch_all_data() -> dict:
         print(f"    → OK: Daily net inflow ${val / 1e6:+.1f}M ({date})" if val is not None else "    → MISSING")
     else:
         print("    → MISSING")
+
+    # 11-12: OHLCV for Technical Analysis (CryptoCompare daily + 4H)
+    print("  Fetching CryptoCompare OHLCV (daily, 365 bars)...")
+    cc_daily_url = "https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=365"
+    cc_daily_raw = http_get(cc_daily_url)
+    daily_candles = _parse_cryptocompare(cc_daily_raw) if isinstance(cc_daily_raw, dict) else []
+    print(f"    → {'OK' if daily_candles else 'MISSING'}: {len(daily_candles)} daily candles")
+
+    print("  Fetching CryptoCompare OHLCV (4H, 200 bars)...")
+    cc_url = "https://min-api.cryptocompare.com/data/v2/histohour?fsym=BTC&tsym=USD&limit=200&aggregate=4"
+    cc_raw = http_get(cc_url)
+    h4_candles = _parse_cryptocompare(cc_raw) if isinstance(cc_raw, dict) else []
+    print(f"    → {'OK' if h4_candles else 'MISSING'}: {len(h4_candles)} 4H candles")
+
+    # Derive weekly from daily
+    weekly_candles = _downsample_to_weekly(daily_candles) if daily_candles else []
+
+    # Compute technical indicators per timeframe
+    results["ta_daily"] = compute_ta(daily_candles) if daily_candles else {}
+    results["ta_4h"] = compute_ta(h4_candles) if h4_candles else {}
+    results["ta_weekly"] = compute_ta(weekly_candles) if weekly_candles else {}
+    ta_ok = bool(results["ta_daily"]) or bool(results["ta_4h"])
+    print(f"    → TA computed: daily={'OK' if results['ta_daily'] else 'MISSING'}, "
+          f"4H={'OK' if results['ta_4h'] else 'MISSING'}, "
+          f"weekly={'OK' if results['ta_weekly'] else 'MISSING'}")
 
     return results
 
@@ -402,6 +430,78 @@ def aggregate_data(data: dict, history: list | None = None) -> str:
             lines.append(f"    {date}: {flow_str}")
     lines.append("")
 
+    # Technical Indicators (compact format, ~80 tokens)
+    ta_daily = data.get("ta_daily", {})
+    ta_4h = data.get("ta_4h", {})
+    ta_weekly = data.get("ta_weekly", {})
+    if ta_daily or ta_4h:
+        lines.append("=== TECHNICAL INDICATORS (BTCUSDT) ===")
+
+        for label, ta in [("Daily", ta_daily), ("4H", ta_4h), ("Weekly", ta_weekly)]:
+            if not ta:
+                lines.append(f"  {label}: N/A")
+                continue
+            parts = []
+            if ta.get("ema20"):
+                parts.append(f"EMA20=${ta['ema20']:.0f}")
+            if ta.get("ema50"):
+                parts.append(f"EMA50=${ta['ema50']:.0f}")
+            if ta.get("ema200"):
+                parts.append(f"EMA200=${ta['ema200']:.0f}")
+            if ta.get("ema_stack"):
+                parts.append(f"Stack={ta['ema_stack']}")
+            if ta.get("ema_slope") is not None:
+                parts.append(f"Slope={ta['ema_slope']:+.3f}%/bar")
+            if ta.get("rsi14") is not None:
+                parts.append(f"RSI14={ta['rsi14']:.0f}")
+            macd = ta.get("macd")
+            if macd:
+                parts.append(f"MACD(line:{macd['line']:+.0f},sig:{macd['signal']:+.0f},hist:{macd['histogram']:+.0f},{macd['trend']})")
+            bb = ta.get("bollinger")
+            if bb:
+                sq = "YES" if bb["squeeze"] else "NO"
+                parts.append(f"BB(upper:{bb['upper']:.0f},lower:{bb['lower']:.0f},width:{bb['width_pct']:.1f}%,squeeze:{sq},%B:{bb['pct_b']:.2f})")
+            lines.append(f"  {label}: {' '.join(parts)}")
+
+        # MTF alignment summary
+        stacks = [ta.get("ema_stack") for ta in [ta_daily, ta_4h, ta_weekly] if ta.get("ema_stack") and ta["ema_stack"] != "UNKNOWN"]
+        bullish_count = sum(1 for s in stacks if s == "BULLISH")
+        bearish_count = sum(1 for s in stacks if s == "BEARISH")
+        if stacks:
+            if bullish_count == len(stacks):
+                mtf = f"{len(stacks)}/{len(stacks)} BULLISH"
+            elif bearish_count == len(stacks):
+                mtf = f"{len(stacks)}/{len(stacks)} BEARISH"
+            else:
+                mtf = f"MIXED ({bullish_count}B/{bearish_count}S/{len(stacks)-bullish_count-bearish_count}M)"
+        else:
+            mtf = "N/A"
+
+        # Key levels from daily EMAs and Bollinger
+        supports = []
+        resistances = []
+        price = ta_daily.get("price", 0)
+        for lbl, val in [("EMA50d", ta_daily.get("ema50")), ("EMA200d", ta_daily.get("ema200"))]:
+            if val and val < price:
+                supports.append(f"${val:.0f}({lbl})")
+            elif val and val > price:
+                resistances.append(f"${val:.0f}({lbl})")
+        bb_d = ta_daily.get("bollinger")
+        if bb_d:
+            if bb_d["lower"] < price:
+                supports.append(f"${bb_d['lower']:.0f}(BBlow)")
+            if bb_d["upper"] > price:
+                resistances.append(f"${bb_d['upper']:.0f}(BBup)")
+
+        sup_str = " ".join(supports) if supports else "none identified"
+        res_str = " ".join(resistances) if resistances else "none identified"
+        lines.append(f"  MTF: {mtf} | Support: {sup_str} | Resistance: {res_str}")
+        lines.append("")
+    else:
+        lines.append("=== TECHNICAL INDICATORS (BTCUSDT) ===")
+        lines.append("  UNAVAILABLE (OHLCV fetch failed)")
+        lines.append("")
+
     # Data quality summary
     source_checks = {
         "FRED DFII10": bool(data.get("dfii10", {}).get("value")),
@@ -414,6 +514,8 @@ def aggregate_data(data: dict, history: list | None = None) -> str:
         "CFTC COT": bool(cot),
         "Blockchain Hash": bool(bc_values),
         "SoSoValue ETF": bool(etf_cur),
+        "CryptoCompare Daily": bool(ta_daily),
+        "CryptoCompare 4H": bool(ta_4h),
     }
     lines.append("=== DATA QUALITY FLAGS ===")
     for src, ok in source_checks.items():
@@ -795,6 +897,216 @@ def _safe_int(long_val, short_val) -> int | None:
         return None
 
 
+# ---------------------------------------------------------------------------
+# TECHNICAL INDICATORS (pure Python, no dependencies)
+# ---------------------------------------------------------------------------
+def _ema(values: list[float], period: int) -> list[float]:
+    """EMA with SMA seed for first N values (avoids first-close bias)."""
+    if len(values) < period:
+        return []
+    k = 2 / (period + 1)
+    sma_seed = sum(values[:period]) / period
+    result = [sma_seed]
+    for v in values[period:]:
+        result.append(v * k + result[-1] * (1 - k))
+    return result
+
+
+def _rsi(closes: list[float], period: int = 14) -> list[float]:
+    """RSI with Wilder smoothing (matches TradingView)."""
+    if len(closes) < period + 1:
+        return []
+    deltas = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
+    gains = [max(d, 0) for d in deltas]
+    losses = [abs(min(d, 0)) for d in deltas]
+    avg_gain = sum(gains[:period]) / period
+    avg_loss = sum(losses[:period]) / period
+    rs = avg_gain / avg_loss if avg_loss != 0 else 100
+    rsi_vals = [100 - 100 / (1 + rs)]
+    for i in range(period, len(deltas)):
+        avg_gain = (avg_gain * (period - 1) + gains[i]) / period
+        avg_loss = (avg_loss * (period - 1) + losses[i]) / period
+        rs = avg_gain / avg_loss if avg_loss != 0 else 100
+        rsi_vals.append(100 - 100 / (1 + rs))
+    return rsi_vals
+
+
+def _macd(closes: list[float]) -> dict | None:
+    """MACD (12, 26, 9). Returns latest values or None."""
+    ema12 = _ema(closes, 12)
+    ema26 = _ema(closes, 26)
+    if not ema12 or not ema26:
+        return None
+    # Align: ema12 starts at index 12, ema26 at index 26, so offset ema12
+    offset = 26 - 12
+    if len(ema12) <= offset:
+        return None
+    macd_line = [ema12[i + offset] - ema26[i] for i in range(len(ema26))]
+    signal = _ema(macd_line, 9)
+    if not signal:
+        return None
+    # Align signal (starts 9 into macd_line)
+    sig_offset = 9
+    if len(macd_line) <= sig_offset:
+        return None
+    hist = macd_line[-1] - signal[-1]
+    prev_hist = macd_line[-2] - signal[-2] if len(signal) >= 2 and len(macd_line) >= sig_offset + 2 else hist
+    return {
+        "line": round(macd_line[-1], 2),
+        "signal": round(signal[-1], 2),
+        "histogram": round(hist, 2),
+        "trend": "EXPANDING" if abs(hist) > abs(prev_hist) else "CONTRACTING",
+    }
+
+
+def _bollinger(closes: list[float], period: int = 20, mult: float = 2.0) -> dict | None:
+    """Bollinger Bands with relative squeeze detection."""
+    if len(closes) < period:
+        return None
+    sma = sum(closes[-period:]) / period
+    variance = sum((c - sma) ** 2 for c in closes[-period:]) / period
+    stddev = math.sqrt(variance)
+    upper = sma + mult * stddev
+    lower = sma - mult * stddev
+    width_pct = (mult * stddev * 2) / sma * 100 if sma else 0
+    price = closes[-1]
+    pct_b = (price - lower) / (upper - lower) if (upper - lower) != 0 else 0.5
+
+    # Relative squeeze: compute BB width over last 100 periods (or available)
+    squeeze = False
+    lookback = min(len(closes), 100)
+    if lookback >= period + 10:
+        widths = []
+        for i in range(lookback - period + 1):
+            sl = closes[-(lookback - i):-(lookback - i - period)] if (lookback - i - period) > 0 else closes[:period]
+            s = sum(closes[len(closes) - lookback + i:len(closes) - lookback + i + period]) / period
+            v = sum((c - s) ** 2 for c in closes[len(closes) - lookback + i:len(closes) - lookback + i + period]) / period
+            w = math.sqrt(v) * mult * 2 / s * 100 if s else 0
+            widths.append(w)
+        if widths:
+            sorted_w = sorted(widths)
+            percentile_20 = sorted_w[max(0, len(sorted_w) // 5)]
+            squeeze = width_pct <= percentile_20
+
+    return {
+        "upper": round(upper, 0),
+        "lower": round(lower, 0),
+        "middle": round(sma, 0),
+        "width_pct": round(width_pct, 1),
+        "pct_b": round(pct_b, 2),
+        "squeeze": squeeze,
+    }
+
+
+def _ema_slope(ema_values: list[float], lookback: int = 5) -> float | None:
+    """Trend strength proxy: % change per bar of EMA over last N bars."""
+    if len(ema_values) < lookback + 1:
+        return None
+    start = ema_values[-(lookback + 1)]
+    end = ema_values[-1]
+    if start == 0:
+        return None
+    return round((end - start) / start * 100 / lookback, 3)
+
+
+def compute_ta(candles: list[dict]) -> dict:
+    """Compute all technical indicators from OHLCV candles. Pure stdlib."""
+    if not candles or len(candles) < 26:
+        return {}
+    closes = [c["close"] for c in candles]
+
+    # EMAs
+    ema20 = _ema(closes, 20)
+    ema50 = _ema(closes, 50)
+    ema200 = _ema(closes, 200)
+    ema20_val = ema20[-1] if ema20 else None
+    ema50_val = ema50[-1] if ema50 else None
+    ema200_val = ema200[-1] if ema200 else None
+
+    # EMA alignment
+    stack = "UNKNOWN"
+    if ema20_val and ema50_val:
+        if ema200_val:
+            if ema20_val > ema50_val > ema200_val:
+                stack = "BULLISH"
+            elif ema20_val < ema50_val < ema200_val:
+                stack = "BEARISH"
+            else:
+                stack = "MIXED"
+        else:
+            if ema20_val > ema50_val:
+                stack = "BULLISH"
+            elif ema20_val < ema50_val:
+                stack = "BEARISH"
+            else:
+                stack = "MIXED"
+
+    # EMA slope (trend strength proxy)
+    slope = _ema_slope(ema20, 5) if ema20 else None
+
+    # RSI
+    rsi_vals = _rsi(closes, 14)
+    rsi_val = round(rsi_vals[-1], 1) if rsi_vals else None
+
+    # MACD
+    macd = _macd(closes)
+
+    # Bollinger Bands
+    bb = _bollinger(closes)
+
+    # Sanity checks
+    result = {
+        "price": closes[-1],
+        "ema20": round(ema20_val, 0) if ema20_val else None,
+        "ema50": round(ema50_val, 0) if ema50_val else None,
+        "ema200": round(ema200_val, 0) if ema200_val else None,
+        "ema_stack": stack,
+        "ema_slope": slope,
+        "rsi14": rsi_val,
+        "macd": macd,
+        "bollinger": bb,
+    }
+
+    # Sanity validation
+    if rsi_val is not None and not (0 <= rsi_val <= 100):
+        print(f"  ⚠ RSI sanity check failed: {rsi_val}, discarding")
+        result["rsi14"] = None
+    if bb and bb["upper"] <= bb["lower"]:
+        print(f"  ⚠ Bollinger sanity check failed: upper <= lower, discarding")
+        result["bollinger"] = None
+
+    return result
+
+
+def _parse_cryptocompare(raw: dict) -> list[dict]:
+    """Parse CryptoCompare histohour response."""
+    data = raw.get("Data", {}).get("Data", [])
+    candles = []
+    for item in data:
+        if isinstance(item, dict) and item.get("close"):
+            candles.append({
+                "open": float(item["open"]),
+                "high": float(item["high"]),
+                "low": float(item["low"]),
+                "close": float(item["close"]),
+            })
+    return candles
+
+
+def _downsample_to_weekly(daily_candles: list[dict]) -> list[dict]:
+    """Downsample daily candles to weekly (groups of 5 trading days)."""
+    weekly = []
+    for i in range(0, len(daily_candles) - 4, 5):
+        chunk = daily_candles[i:i + 5]
+        weekly.append({
+            "open": chunk[0]["open"],
+            "high": max(c["high"] for c in chunk),
+            "low": min(c["low"] for c in chunk),
+            "close": chunk[-1]["close"],
+        })
+    return weekly
+
+
 def load_history() -> list:
     """Load historical data snapshots."""
     if HISTORY_FILE.exists():
@@ -958,7 +1270,7 @@ def main():
     # Check data quality
     missing_count = data_text.count("MISSING")
     ok_count = data_text.count(": OK")
-    print(f"  Data quality: {ok_count}/10 OK, {missing_count}/10 MISSING")
+    print(f"  Data quality: {ok_count}/12 OK, {missing_count}/12 MISSING")
     if missing_count > 5:
         print("  ⚠ WARNING: Most data sources failed. Report will rely on estimates.")
 
@@ -994,7 +1306,7 @@ def main():
             f.write(f"**{result['alert_message']}**\n\n")
             if result.get("recommendation_changed"):
                 f.write(f"⚡ Changed from `{prev_rec}` → `{result['recommendation']}`\n\n")
-            f.write(f"Data quality: {ok_count}/10 sources OK\n")
+            f.write(f"Data quality: {ok_count}/12 sources OK\n")
 
     print("\n✅ Done!")
 
