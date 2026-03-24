@@ -154,11 +154,59 @@ For 100% crypto portfolio:
 
 Gmail strips most CSS. You MUST follow these rules:
 
-1. **ALL styles must be INLINE** - no <style> blocks, Gmail ignores them
+1. **ALL styles must be INLINE** - no `<style>` blocks, Gmail ignores them
 2. **DO NOT USE TABLES FOR DATA** - they truncate on mobile Gmail. Use stacked card/div layouts.
-3. **Base font size: 16px minimum** for body text
-4. **Max width 100%** on all elements - use style="width:100%; max-width:600px;"
-5. **Use padding not margin** for spacing (Gmail strips some margins)
+3. **Use padding not margin** for spacing (Gmail strips some margins)
+4. **Stack everything vertically** - never place two data values side-by-side. One column layout only.
+
+### INLINE STYLE SPECIFICATIONS (COPY THESE EXACT STYLE ATTRIBUTES)
+
+You MUST use these exact inline style strings on the corresponding elements. Do not deviate.
+
+**Body wrapper div** (outermost container):
+`style="width:100%; max-width:600px; margin:0 auto; padding:16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:17px; line-height:1.6; color:#e5e7eb; background-color:#0f1117;"`
+
+**Section card** (each major section):
+`style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;"`
+
+**Section title** (gold uppercase label at top of each card):
+`style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;"`
+
+**Data label** (secondary descriptive text):
+`style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;"`
+
+**Data value** (primary numbers and values):
+`style="font-size:22px; font-weight:700; color:#ffffff; margin:0 0 12px 0;"`
+
+**Hero number** (BTC price, composite score, allocation % - the most important figures):
+`style="font-size:28px; font-weight:800; color:#ffffff; margin:0 0 12px 0;"`
+
+**Agent signal card** (one per agent, colored left border):
+- Bullish: `style="border-left:4px solid #22c55e; padding:12px 16px; margin-bottom:10px; background-color:#1e2433; border-radius:0 8px 8px 0;"`
+- Bearish: `style="border-left:4px solid #ef4444; padding:12px 16px; margin-bottom:10px; background-color:#1e2433; border-radius:0 8px 8px 0;"`
+- Neutral: `style="border-left:4px solid #d97706; padding:12px 16px; margin-bottom:10px; background-color:#1e2433; border-radius:0 8px 8px 0;"`
+
+**Direction badge** (inline BULLISH/BEARISH/NEUTRAL label):
+- Bullish: `style="display:inline-block; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; background-color:#22c55e; color:#fff;"`
+- Bearish: `style="display:inline-block; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; background-color:#ef4444; color:#fff;"`
+- Neutral: `style="display:inline-block; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; background-color:#d97706; color:#fff;"`
+
+**Recommendation box** (the main action call):
+`style="text-align:center; padding:28px 20px; border-radius:12px; margin:20px 0;"`
+- BUY/STRONG_BUY background: `background-color:#166534;`
+- HOLD/ACCUMULATE background: `background-color:#92400e;`
+- SELL/REDUCE/STRONG_SELL background: `background-color:#991b1b;`
+- Recommendation text: `style="font-size:28px; font-weight:800; color:#ffffff; margin:0;"`
+
+**Spacing rules:**
+- Card padding: NEVER less than 18px
+- Between cards: margin-bottom:16px
+- Between data items within a card: margin-bottom:10px
+
+**Contrast rules:**
+- All body text: #e5e7eb or brighter on dark backgrounds
+- Labels/secondary text: #9ca3af minimum
+- NEVER use text colors darker than #6b7280 on dark backgrounds
 
 ### Report Sections (all using stacked card layout, NO TABLES)
 
@@ -178,6 +226,74 @@ Gmail strips most CSS. You MUST follow these rules:
 14. **Risk Factors** - Red left-border card
 15. **Catalyst Calendar** - Stacked date/event items
 16. **Conflicts** - Note any unresolved agent disagreements
+17. **Composite Score Trend (90-Day)** - Visual bar chart showing how composite score changed over time. See rendering instructions below.
+
+### COMPOSITE SCORE TREND GRAPH (Section 17 - Pure CSS Vertical Bar Chart)
+
+If the COMPOSITE SCORE HISTORY section in the data contains 7 or more entries, render a vertical bar chart. If fewer than 7 entries, SKIP this section entirely.
+
+Render as a pure CSS vertical bar chart using ONLY inline-styled divs. No JavaScript, no SVG, no images, no `<canvas>`.
+
+**Chart structure:**
+
+Wrap in a section card. Add title:
+`<div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 16px 0;">COMPOSITE SCORE TREND</div>`
+
+The chart is a row of vertical bars. Each bar represents one day's composite score. Bars grow UP from a center baseline (bullish/positive) or DOWN (bearish/negative), like a histogram.
+
+**Chart container** (holds all bars in a horizontal row):
+```html
+<div style="display:flex; align-items:center; height:120px; padding:0 4px; position:relative;">
+  <!-- Center baseline (score = 0) -->
+  <div style="position:absolute; left:0; right:0; top:50%; height:1px; background-color:#374151;"></div>
+
+  <!-- One bar per data point, laid out left-to-right -->
+  {BARS}
+</div>
+```
+
+**Each bar** (one per data point):
+```html
+<div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+  <!-- Top half: bullish bars grow upward from center -->
+  <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;">
+    <!-- Only if score > 0 -->
+    <div style="width:80%; max-width:6px; border-radius:2px 2px 0 0; background-color:{COLOR}; height:{BAR_HEIGHT_PCT}%;"></div>
+  </div>
+  <!-- Bottom half: bearish bars grow downward from center -->
+  <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+    <!-- Only if score < 0 -->
+    <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:{COLOR}; height:{BAR_HEIGHT_PCT}%;"></div>
+  </div>
+</div>
+```
+
+**Date labels row** (below the chart):
+```html
+<div style="display:flex; padding:4px 4px 0 4px;">
+  <!-- One cell per bar, but only show label every ~15 bars -->
+  <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;">{DATE_OR_EMPTY}</div>
+  ...
+</div>
+```
+
+**Rules:**
+- Bar height percentage: `abs(score) * 100`, capped at 100% of the half-container.
+- Positive scores: bar in the TOP half, growing upward. Color: `#22c55e` (green).
+- Negative scores: bar in the BOTTOM half, growing downward. Color: `#ef4444` (red).
+- Score near zero (abs < 0.05): use amber `#d97706` and minimum height 4%.
+- Only render the bar div in the correct half (top for positive, bottom for negative). Leave the other half empty.
+- Date labels: show every 15th bar (e.g., "Mar 01"). All others empty.
+- Each bar div uses `flex:1` so they distribute evenly across the container width.
+- Max bar width: 6px with 80% of flex cell, so bars have small gaps between them.
+
+**Legend** (below date labels):
+```html
+<div style="display:flex; justify-content:center; font-size:11px; color:#6b7280; margin-top:6px;">
+  <span style="color:#22c55e; margin-right:16px;">&#9650; Bullish</span>
+  <span style="color:#ef4444;">&#9660; Bearish</span>
+</div>
+```
 
 IMMEDIATELY AFTER the closing </html> tag, output this JSON block:
 ```json

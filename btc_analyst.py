@@ -53,9 +53,8 @@ PROMPT_TEMPLATE = Path(__file__).parent / "prompt_template.txt"
 DATA_DIR = Path(__file__).parent / "data"
 PREV_REC_FILE = DATA_DIR / "previous_recommendation.json"
 HISTORY_FILE = DATA_DIR / "history.json"
-MAX_HISTORY_DAYS = 45  # ~6 weeks. BTC Fear&Greed already gives 30d lookback;
-                       # 45d of price/macro/mining trends is optimal for
-                       # trend analysis without burning >1600 tokens.
+MAX_HISTORY_DAYS = 90  # ~3 months. Provides enough data for composite score
+                       # trend graph and multi-timeframe trend analysis.
 
 
 # ---------------------------------------------------------------------------
@@ -1117,7 +1116,7 @@ def load_history() -> list:
     return []
 
 
-def save_daily_snapshot(data: dict, recommendation: str = "PENDING"):
+def save_daily_snapshot(data: dict, recommendation: str = "PENDING", composite_score: float = 0.0):
     """Append today's data point to rolling history."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     history = load_history()
@@ -1150,6 +1149,7 @@ def save_daily_snapshot(data: dict, recommendation: str = "PENDING"):
         "cot_oi": _safe_float(cot_latest.get("open_interest_all")),
         "etf_flow_m": etf_daily_m,
         "recommendation": recommendation,
+        "composite_score": composite_score,
     }
 
     # Replace today if re-running
@@ -1170,8 +1170,8 @@ def format_history_for_prompt(history: list) -> str:
         "",
         "=== ROLLING DATA HISTORY (last {} days, for trend analysis) ===".format(len(history)),
         "",
-        "Date       | BTC($)  | Real10Y | DXY    | VIX   | F&G | Hash(EH) | NetSpec | OI     | ETF$M  | Rec",
-        "-----------|---------|---------|--------|-------|-----|----------|---------|--------|--------|----",
+        "Date       | BTC($)  | Real10Y | DXY    | VIX   | F&G | Hash(EH) | NetSpec | OI     | ETF$M  | Score | Rec",
+        "-----------|---------|---------|--------|-------|-----|----------|---------|--------|--------|-------|----",
     ]
 
     for h in history:
@@ -1184,10 +1184,12 @@ def format_history_for_prompt(history: list) -> str:
         net = f"{h.get('cot_net_spec', 0):>7d}" if h.get("cot_net_spec") is not None else "    N/A"
         oi = f"{h.get('cot_oi', 0):>6.0f}" if h.get("cot_oi") is not None else "   N/A"
         etf = f"{h.get('etf_flow_m', 0):>+6.0f}" if h.get("etf_flow_m") is not None else "   N/A"
+        cs = h.get("composite_score")
+        scr = f"{cs:>+5.2f}" if cs is not None else "  N/A"
         rec = h.get("recommendation", "?")[:4]
 
         lines.append(
-            f"{h.get('date', '?'):10s} | {btc} | {dfii} | {dxy} | {vix} | {fng} | {hsh} | {net} | {oi} | {etf} | {rec}"
+            f"{h.get('date', '?'):10s} | {btc} | {dfii} | {dxy} | {vix} | {fng} | {hsh} | {net} | {oi} | {etf} | {scr} | {rec}"
         )
 
     lines.append("")
@@ -1199,6 +1201,19 @@ def format_history_for_prompt(history: list) -> str:
     lines.append("USE THIS HISTORY TO: identify trends in price momentum, macro conditions,")
     lines.append("sentiment shifts, hash rate growth, and positioning changes.")
     lines.append("Compare today's values against the recent trajectory, not just static levels.")
+
+    # Compact composite score history for the trend graph
+    graph_entries = [h for h in history if h.get("composite_score") is not None]
+    if len(graph_entries) >= 7:
+        lines.append("")
+        lines.append("=== COMPOSITE SCORE HISTORY (for trend graph) ===")
+        lines.append("")
+        lines.append("Date       | Score  | Rec")
+        lines.append("-----------|--------|------")
+        for h in graph_entries:
+            lines.append(
+                f"{h.get('date', '?'):10s} | {h['composite_score']:>+5.2f} | {h.get('recommendation', '?')[:4]}"
+            )
 
     return "\n".join(lines)
 
@@ -1293,7 +1308,7 @@ def main():
 
     # 6. Save recommendation + daily snapshot
     save_recommendation(result)
-    save_daily_snapshot(data, result["recommendation"])
+    save_daily_snapshot(data, result["recommendation"], result["composite_score"])
 
     # 6b. Save report artifacts for Twitter poster
     date_str = datetime.now(timezone.utc).strftime('%Y%m%d')
