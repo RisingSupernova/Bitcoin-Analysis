@@ -48,7 +48,9 @@ jobs:
         run: |
           git config user.name "BTC Analyst Bot"
           git config user.email "bot@btc-analyst.local"
-          git add data/previous_recommendation.json data/history.json data/report_*.html data/twitter_meta_*.json data/twitter_posted_*.json || true
+          git add data/previous_recommendation.json data/history.json || true
+          git add data/report_*.html data/twitter_meta_*.json || true
+          git add data/twitter_posted_*.json || true
           RECOMMENDATION=$(python -c "import json; d=json.load(open('data/previous_recommendation.json')); print(d.get('recommendation','UNKNOWN'))" 2>/dev/null || echo "UNKNOWN")
           git commit -m "₿ BTC report $(date +%Y-%m-%d) — $RECOMMENDATION" || echo "No changes to commit"
           git push || echo "Push failed"
