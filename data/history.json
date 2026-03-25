@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "date": "2026-03-25",
+    "btc_price": 71124.0,
+    "dfii10": 2.01,
+    "dollar_idx": 120.2757,
+    "vix": 26.15,
+    "fng": 14,
+    "hash_eh": 0.9,
+    "cot_net_spec": 5886,
+    "cot_oi": 23807.0,
+    "etf_flow_m": -66.7,
+    "recommendation": "SELL",
+    "composite_score": -0.59
+  }
+]
