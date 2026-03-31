@@ -54,5 +54,19 @@
     "etf_flow_m": -225.5,
     "recommendation": "STRONG_SELL",
     "composite_score": -0.4
+  },
+  {
+    "date": "2026-03-31",
+    "btc_price": 67606.0,
+    "dfii10": 2.13,
+    "dollar_idx": 120.8851,
+    "vix": 31.05,
+    "fng": 11,
+    "hash_eh": 0.9,
+    "cot_net_spec": 5068,
+    "cot_oi": 23268.0,
+    "etf_flow_m": 69.4,
+    "recommendation": "STRONG_SELL",
+    "composite_score": -0.497
   }
 ]
