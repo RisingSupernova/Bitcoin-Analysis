@@ -110,5 +110,19 @@
     "etf_flow_m": 9.0,
     "recommendation": "REDUCE",
     "composite_score": -0.226
+  },
+  {
+    "date": "2026-04-06",
+    "btc_price": 69172.0,
+    "dfii10": 1.97,
+    "dollar_idx": 120.8851,
+    "vix": 24.54,
+    "fng": 13,
+    "hash_eh": 1.1,
+    "cot_net_spec": 0,
+    "cot_oi": 137686.0,
+    "etf_flow_m": 9.0,
+    "recommendation": "REDUCE",
+    "composite_score": -0.19
   }
 ]
