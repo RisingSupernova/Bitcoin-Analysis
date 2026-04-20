@@ -250,5 +250,19 @@
     "etf_flow_m": 26.1,
     "recommendation": "HOLD",
     "composite_score": -0.018
+  },
+  {
+    "date": "2026-04-20",
+    "btc_price": 74296.0,
+    "dfii10": 1.93,
+    "dollar_idx": 118.8552,
+    "vix": 17.94,
+    "fng": 29,
+    "hash_eh": 1.06,
+    "cot_net_spec": 0,
+    "cot_oi": 205954.0,
+    "etf_flow_m": 663.9,
+    "recommendation": "HOLD",
+    "composite_score": -0.06
   }
 ]
