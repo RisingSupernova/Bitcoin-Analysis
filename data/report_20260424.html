@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTC Position-Trading Report — 2026-04-24</title>
+</head>
+<body style="margin:0; padding:0; background-color:#0a0c14;">
+<div style="width:100%; max-width:600px; margin:0 auto; padding:16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:17px; line-height:1.6; color:#e5e7eb; background-color:#0f1117;">
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 1: HEADER -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%); border-radius:12px; padding:28px 20px 22px 20px; margin-bottom:16px; text-align:center;">
+  <div style="font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#d4a853; margin-bottom:8px;">CIO ORCHESTRATOR SYSTEM · API-SOURCED DATA</div>
+  <div style="font-size:26px; font-weight:800; color:#ffffff; margin-bottom:4px;">₿ BTC Position Report</div>
+  <div style="font-size:14px; color:#9ca3af;">Friday, 24 April 2026 · Daily Allocation Analysis</div>
+  <div style="margin-top:12px; display:inline-block; padding:4px 14px; background-color:#991b1b; border-radius:20px; font-size:12px; font-weight:700; color:#fca5a5; letter-spacing:1px;">PREV REC: REDUCE → TODAY: REDUCE (NO CHANGE)</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 2: EXECUTIVE SUMMARY -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Executive Summary</div>
+  <p style="font-size:15px; color:#e5e7eb; margin:0 0 10px 0;">Bitcoin has staged a meaningful recovery to <strong style="color:#ffffff;">$77,931</strong> (+16% off late-March lows near $67k), catalysed by a U.S.–Iran ceasefire extension, Strategy's $2.54B BTC purchase, and seven consecutive days of spot ETF inflows totalling <strong style="color:#ffffff;">$1.685B</strong>. Sentiment has rebounded from Extreme Fear (F&amp;G 18, 30d avg) to Fear (39 current).</p>
+  <p style="font-size:15px; color:#e5e7eb; margin:0 0 10px 0;">Despite the constructive near-term price action, structural headwinds dominate: the cycle is in <strong style="color:#f87171;">EARLY_BEAR</strong> (735 days post-halving), BTC remains <strong style="color:#f87171;">38.2% below its $126,080 ATH</strong>, real rates sit at a restrictive 1.92%, hash rate has declined 19.85% in 30 days, and the weekly EMA stack is bearish with EMA50 at $87,149 acting as a major overhead ceiling.</p>
+  <p style="font-size:15px; color:#e5e7eb; margin:0;">Composite score: <strong style="color:#f87171;">−0.220</strong> (REDUCE signal, LOW conviction). Recommendation is unchanged from yesterday.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 3: CYCLE POSITION -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Cycle Position</div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Days Since Halving (2024-04-19)</div>
+    <div style="font-size:22px; font-weight:700; color:#ffffff; margin:0 0 12px 0;">735 days</div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Days Until Next Halving (~2028-04-07)</div>
+    <div style="font-size:22px; font-weight:700; color:#ffffff; margin:0 0 12px 0;">713 days</div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Cycle Midpoint Status</div>
+    <div style="font-size:16px; color:#e5e7eb; margin:0 0 12px 0;">735 / (735+713) = <strong>50.7%</strong> through current cycle — approaching midpoint</div>
+  </div>
+
+  <div>
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Estimated Phase (API-sourced, Authoritative)</div>
+    <div style="display:inline-block; padding:6px 16px; border-radius:6px; font-size:14px; font-weight:700; background-color:#7f1d1d; color:#fca5a5; letter-spacing:1px;">EARLY_BEAR</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 4: MARKET REGIME -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Market Regime</div>
+  <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Active Regime (derived from cycle.estimated_phase = EARLY_BEAR)</div>
+  <div style="display:inline-block; padding:8px 20px; border-radius:8px; font-size:18px; font-weight:800; background-color:#7f1d1d; color:#fca5a5; letter-spacing:2px; margin-bottom:10px;">BEAR</div>
+  <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Weight Schema Applied</div>
+  <div style="font-size:14px; color:#e5e7eb; line-height:1.8;">On-Chain 15% · Mining 15% · Macro 20% · ETF 10% · Derivatives 20% · Technical 20%</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 5: KEY MARKET DATA -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Key Market Data (API-sourced)</div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">BTC Price (CoinGecko)</div>
+    <div style="font-size:28px; font-weight:800; color:#ffffff; margin:0 0 12px 0;">$77,931</div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">24h Change</div>
+    <div style="font-size:22px; font-weight:700; color:#f87171; margin:0 0 12px 0;">−0.40%</div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">7-Day Change</div>
+    <div style="font-size:22px; font-weight:700; color:#4ade80; margin:0 0 12px 0;">+4.20%</div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">30-Day Change</div>
+    <div style="font-size:22px; font-weight:700; color:#4ade80; margin:0 0 12px 0;">+9.63%</div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Distance from ATH ($126,080)</div>
+    <div style="font-size:22px; font-weight:700; color:#f87171; margin:0 0 12px 0;">−38.19%</div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Market Cap</div>
+    <div style="font-size:22px; font-weight:700; color:#ffffff; margin:0 0 12px 0;">$1.560T</div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">24h Volume</div>
+    <div style="font-size:22px; font-weight:700; color:#ffffff; margin:0 0 12px 0;">$38.69B</div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Dollar Index / DXY (FRED DTWEXBGS, 2026-04-17)</div>
+    <div style="font-size:22px; font-weight:700; color:#f87171; margin:0 0 12px 0;">118.08 <span style="font-size:14px; color:#9ca3af;">↓ from 120.9 (Mar highs) — headwind, but easing</span></div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">10Y Real Yield / DFII10 (FRED, 2026-04-22)</div>
+    <div style="font-size:22px; font-weight:700; color:#f87171; margin:0 0 12px 0;">1.92% <span style="font-size:14px; color:#9ca3af;">↑ headwind (threshold: >1.5%)</span></div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">VIX (FRED, 2026-04-22)</div>
+    <div style="font-size:22px; font-weight:700; color:#4ade80; margin:0 0 12px 0;">18.92 <span style="font-size:14px; color:#9ca3af;">↓ neutral-bullish (threshold: &lt;25)</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 6: SENTIMENT -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Sentiment — Fear &amp; Greed Index (API-sourced)</div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Current Reading</div>
+    <div style="font-size:28px; font-weight:800; color:#fbbf24; margin:0 0 4px 0;">39 — FEAR</div>
+  </div>
+
+  <div style="background-color:#111827; border-radius:8px; padding:10px 14px; margin-bottom:10px;">
+    <div style="display:flex; align-items:center; margin-bottom:6px;">
+      <div style="font-size:13px; color:#9ca3af; width:130px;">Current</div>
+      <div style="flex:1; background-color:#374151; border-radius:4px; height:10px; position:relative;">
+        <div style="position:absolute; left:0; top:0; height:10px; width:39%; background-color:#fbbf24; border-radius:4px;"></div>
+      </div>
+      <div style="font-size:13px; color:#fbbf24; width:36px; text-align:right;">39</div>
+    </div>
+    <div style="display:flex; align-items:center; margin-bottom:6px;">
+      <div style="font-size:13px; color:#9ca3af; width:130px;">7-Day Avg</div>
+      <div style="flex:1; background-color:#374151; border-radius:4px; height:10px; position:relative;">
+        <div style="position:absolute; left:0; top:0; height:10px; width:33%; background-color:#f97316; border-radius:4px;"></div>
+      </div>
+      <div style="font-size:13px; color:#f97316; width:36px; text-align:right;">33</div>
+    </div>
+    <div style="display:flex; align-items:center;">
+      <div style="font-size:13px; color:#9ca3af; width:130px;">30-Day Avg</div>
+      <div style="flex:1; background-color:#374151; border-radius:4px; height:10px; position:relative;">
+        <div style="position:absolute; left:0; top:0; height:10px; width:18%; background-color:#ef4444; border-radius:4px;"></div>
+      </div>
+      <div style="font-size:13px; color:#ef4444; width:36px; text-align:right;">18</div>
+    </div>
+  </div>
+  <div style="font-size:14px; color:#9ca3af;">Rapid sentiment recovery from Extreme Fear (18) → Fear (39) in 30 days. Contrarian setup intact but not extreme enough (&lt;25) for full contrarian bonus.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 7: MINING DATA -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Mining Network (API-sourced)</div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Current Hash Rate</div>
+    <div style="font-size:22px; font-weight:700; color:#f87171; margin:0 0 4px 0;">0.82 ZH/s</div>
+    <div style="font-size:13px; color:#9ca3af;">Network-level data; consistent with ~820 EH/s mempool estimate</div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">30-Day Hash Rate Change</div>
+    <div style="font-size:22px; font-weight:700; color:#f87171; margin:0 0 12px 0;">−19.85% <span style="font-size:14px;">(1.02 → 0.82)</span></div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Current Difficulty Epoch Progress</div>
+    <div style="font-size:22px; font-weight:700; color:#ffffff; margin:0 0 4px 0;">44.49%</div>
+    <div style="background-color:#111827; border-radius:4px; height:10px; margin-bottom:8px;">
+      <div style="width:44.49%; height:10px; background-color:#d97706; border-radius:4px;"></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Difficulty Change (Last Retarget)</div>
+    <div style="font-size:22px; font-weight:700; color:#fbbf24; margin:0 0 12px 0;">−4.20%</div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Next Estimated Retarget</div>
+    <div style="font-size:22px; font-weight:700; color:#ffffff; margin:0 0 4px 0;">2026-05-02</div>
+    <div style="font-size:13px; color:#9ca3af;">1,119 blocks remaining · Slower blocks (10:47 avg) suggest another modest difficulty decrease</div>
+  </div>
+
+  <div style="border-left:4px solid #ef4444; padding:10px 14px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:13px; color:#fca5a5; font-weight:600;">⚠ Miner Stress Signal Active — Hash rate -19.85% in 30d exceeds -10% capitulation threshold. Miner revenue compression noted at standard electricity costs.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 8: AGENT SIGNALS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Agent Signals (6-Agent Framework)</div>
+
+  <!-- Agent 1: Macro -->
+  <div style="border-left:4px solid #ef4444; padding:12px 16px; margin-bottom:10px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:13px; font-weight:700; color:#9ca3af; margin-bottom:6px;">AGENT 1 · MACRO ANALYST</div>
+    <div style="margin-bottom:6px;">
+      <span style="display:inline-block; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; background-color:#ef4444; color:#fff;">BEARISH</span>
+      <span style="font-size:14px; color:#9ca3af; margin-left:10px;">Confidence: 55%</span>
+      <span style="font-size:13px; color:#6b7280; margin-left:8px;">Weight: 20%</span>
+    </div>
+    <div style="font-size:14px; color:#e5e7eb;">Real yield 1.92% (>1.5% headwind threshold). DXY 118.08 (>104 headwind, though declining from 120.9 peak). VIX 18.92 is benign (&lt;25), providing a partial offset. DXY trend lower is a positive drift but absolute level remains restrictive. Net: macro headwinds dominate.</div>
+  </div>
+
+  <!-- Agent 2: On-Chain -->
+  <div style="border-left:4px solid #ef4444; padding:12px 16px; margin-bottom:10px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:13px; font-weight:700; color:#9ca3af; margin-bottom:6px;">AGENT 2 · ON-CHAIN ANALYST</div>
+    <div style="margin-bottom:6px;">
+      <span style="display:inline-block; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; background-color:#ef4444; color:#fff;">BEARISH</span>
+      <span style="font-size:14px; color:#9ca3af; margin-left:10px;">Confidence: 65%</span>
+      <span style="font-size:13px; color:#6b7280; margin-left:8px;">Weight: 15%</span>
+    </div>
+    <div style="font-size:14px; color:#e5e7eb;">Cycle phase is EARLY_BEAR (authoritative). BTC at $77,931 is 38.19% below ATH ($126,080). Price recovery is real (+9.63% 30d, +4.20% 7d) but reflects a bear market bounce, not a new bull leg. Supply: 20.02M circulating (95.3% of 21M cap). The recovery from $67k has been meaningful but BTC must clear $82,996 (EMA200d) to challenge the bearish cycle narrative.</div>
+  </div>
+
+  <!-- Agent 3: Mining -->
+  <div style="border-left:4px solid #ef4444; padding:12px 16px; margin-bottom:10px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:13px; font-weight:700; color:#9ca3af; margin-bottom:6px;">AGENT 3 · MINING ANALYST</div>
+    <div style="margin-bottom:6px;">
+      <span style="display:inline-block; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; background-color:#ef4444; color:#fff;">BEARISH</span>
+      <span style="font-size:14px; color:#9ca3af; margin-left:10px;">Confidence: 65%</span>
+      <span style="font-size:13px; color:#6b7280; margin-left:8px;">Weight: 15%</span>
+    </div>
+    <div style="font-size:14px; color:#e5e7eb;">Hash rate -19.85% over 30 days (1.02 → 0.82, well above the -10% stress threshold). Difficulty fell -4.20% at last retarget. Next retarget (May 2) likely another decrease given 10:47 min avg block times. Miners are switching off hardware under margin pressure. This is a miner capitulation signal consistent with early bear conditions. Note: web data shows network-level hash rate near ~1 ZH/s (larger miners remain active); mempool short-term metric captures recent decline.</div>
+  </div>
+
+  <!-- Agent 4: ETF Flows -->
+  <div style="border-left:4px solid #22c55e; padding:12px 16px; margin-bottom:10px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:13px; font-weight:700; color:#9ca3af; margin-bottom:6px;">AGENT 4 · ETF FLOW ANALYST</div>
+    <div style="margin-bottom:6px;">
+      <span style="display:inline-block; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; background-color:#22c55e; color:#fff;">BULLISH</span>
+      <span style="font-size:14px; color:#9ca3af; margin-left:10px;">Confidence: 85%</span>
+      <span style="font-size:13px; color:#6b7280; margin-left:8px;">Weight: 10%</span>
+    </div>
+    <div style="font-size:14px; color:#e5e7eb;">Daily: <strong style="color:#4ade80;">+$223.2M</strong> (2026-04-23) · 7D: <strong style="color:#4ade80;">+$1,685.2M</strong> (7/7 inflow days) · 30D: <strong style="color:#4ade80;">+$2,647.5M</strong>. IBIT: +$167.5M (AUM $63.14B). Base signal: daily >$200M = BULLISH (conf 75); 7D positive + daily positive = +10 confidence → 85%. Total AUM $102.79B, holdings 1,319,780 BTC. Cumulative net inflow still -$7.78B (structural overhang), but recent flow direction is clearly constructive.</div>
+  </div>
+
+  <!-- Agent 5: Derivatives / Positioning -->
+  <div style="border-left:4px solid #d97706; padding:12px 16px; margin-bottom:10px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:13px; font-weight:700; color:#9ca3af; margin-bottom:6px;">AGENT 5 · DERIVATIVES &amp; POSITIONING ANALYST</div>
+    <div style="margin-bottom:6px;">
+      <span style="display:inline-block; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; background-color:#d97706; color:#fff;">NEUTRAL</span>
+      <span style="font-size:14px; color:#9ca3af; margin-left:10px;">Confidence: 50%</span>
+      <span style="font-size:13px; color:#6b7280; margin-left:8px;">Weight: 20%</span>
+    </div>
+    <div style="font-size:14px; color:#e5e7eb;">F&amp;G current 39 (Fear) · 7d avg 33 · 30d avg 18. Sentiment below 25 threshold for contrarian bonus, but recovery from extreme fear is constructive. COT (2026-04-14, 10 days stale): Leveraged Money Net = +78,788 contracts (Long 120,243 vs Short 41,455), OI 205,954. <strong style="color:#fbbf24;">⚠ Data anomaly:</strong> "previous week" also dated 2026-04-14 with OI=41,171 vs current 205,954 — 5x OI jump flagged as potential feed error. If real, the massive leveraged-long crowding is a contrarian concern. Stale COT data (-10% confidence modifier applied).</div>
+  </div>
+
+  <!-- Agent 6: Technical -->
+  <div style="border-left:4px solid #d97706; padding:12px 16px; margin-bottom:10px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:13px; font-weight:700; color:#9ca3af; margin-bottom:6px;">AGENT 6 · TECHNICAL ANALYST</div>
+    <div style="margin-bottom:6px;">
+      <span style="display:inline-block; padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; background-color:#d97706; color:#fff;">NEUTRAL</span>
+      <span style="font-size:14px; color:#9ca3af; margin-left:10px;">Confidence: 50%</span>
+      <span style="font-size:13px; color:#6b7280; margin-left:8px;">Weight: 20%</span>
+    </div>
+    <div style="font-size:14px; color:#e5e7eb;">Daily EMA stack MIXED: EMA20 $74,492 &lt; EMA50 $72,796 &lt; price $77,931 BUT below EMA200 $82,996. Daily RSI 64 (elevated, not overbought), MACD hist +386 but CONTRACTING (momentum fading). BB %B=0.85 — price near upper band with 15.1% width (no squeeze). 4H stack BULLISH (all EMAs below price), RSI 55, MACD hist -66 expanding (bearish 4H divergence). Weekly stack BEARISH (EMA50 $87,149 far above price), slope -0.31%/bar, RSI 50, MACD hist +1,899 expanding (weekly bullish divergence). MTF MIXED (1B/1S/1M): -10% confidence modifier. No squeeze, no extreme RSI. Net: NEUTRAL.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 9: COMPOSITE SCORE CALCULATION -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Composite Score Calculation</div>
+
+  <!-- Macro -->
+  <div style="margin-bottom:8px; padding:10px 14px; background-color:#111827; border-radius:8px;">
+    <div style="font-size:13px; color:#9ca3af; margin-bottom:4px;">Macro · BEARISH(−1) × 20% weight × 55% conf</div>
+    <div style="font-size:16px; font-weight:700; color:#f87171;">= −0.110</div>
+  </div>
+  <!-- On-Chain -->
+  <div style="margin-bottom:8px; padding:10px 14px; background-color:#111827; border-radius:8px;">
+    <div style="font-size:13px; color:#9ca3af; margin-bottom:4px;">On-Chain · BEARISH(−1) × 15% weight × 65% conf</div>
+    <div style="font-size:16px; font-weight:700; color:#f87171;">= −0.098</div>
+  </div>
+  <!-- Mining -->
+  <div style="margin-bottom:8px; padding:10px 14px; background-color:#111827; border-radius:8px;">
+    <div style="font-size:13px; color:#9ca3af; margin-bottom:4px;">Mining · BEARISH(−1) × 15% weight × 65% conf</div>
+    <div style="font-size:16px; font-weight:700; color:#f87171;">= −0.098</div>
+  </div>
+  <!-- ETF -->
+  <div style="margin-bottom:8px; padding:10px 14px; background-color:#111827; border-radius:8px;">
+    <div style="font-size:13px; color:#9ca3af; margin-bottom:4px;">ETF Flows · BULLISH(+1) × 10% weight × 85% conf</div>
+    <div style="font-size:16px; font-weight:700; color:#4ade80;">= +0.085</div>
+  </div>
+  <!-- Derivatives -->
+  <div style="margin-bottom:8px; padding:10px 14px; background-color:#111827; border-radius:8px;">
+    <div style="font-size:13px; color:#9ca3af; margin-bottom:4px;">Derivatives · NEUTRAL(0) × 20% weight × 50% conf</div>
+    <div style="font-size:16px; font-weight:700; color:#9ca3af;">= 0.000</div>
+  </div>
+  <!-- Technical -->
+  <div style="margin-bottom:12px; padding:10px 14px; background-color:#111827; border-radius:8px;">
+    <div style="font-size:13px; color:#9ca3af; margin-bottom:4px;">Technical · NEUTRAL(0) × 20% weight × 50% conf</div>
+    <div style="font-size:16px; font-weight:700; color:#9ca3af;">= 0.000</div>
+  </div>
+
+  <div style="height:1px; background-color:#374151; margin-bottom:12px;"></div>
+
+  <div style="font-size:14px; color:#9ca3af; margin-bottom:4px;">Raw Composite Score</div>
+  <div style="font-size:28px; font-weight:800; color:#f87171; margin-bottom:12px;">−0.220</div>
+
+  <div style="font-size:13px; font-weight:700; color:#d4a853; margin-bottom:8px; letter-spacing:1px;">CONFIDENCE MODIFIERS</div>
+  <div style="font-size:14px; color:#e5e7eb; line-height:1.9;">
+    Base avg confidence: (55+65+65+85+50+50)/6 = <strong>61.7%</strong><br>
+    Alignment (3 Bear / 1 Bull / 2 Neutral — no 4-of-6 alignment): <strong style="color:#9ca3af;">0%</strong><br>
+    Stale COT data (&gt;7 days, 10 days stale): <strong style="color:#f87171;">−10%</strong><br>
+    MTF divergence (Technical diverges across timeframes): <strong style="color:#f87171;">−0%</strong> (already in agent confidence)<br>
+    Conflict: Macro BEARISH vs ETF BULLISH (not macro vs on-chain, partial): <strong style="color:#9ca3af;">0%</strong><br>
+    <strong>Adjusted Confidence: 61.7% − 10% = 51.7%</strong>
+  </div>
+
+  <div style="margin-top:12px; padding:10px 14px; background-color:#2d1b1b; border-radius:8px; border:1px solid #7f1d1d;">
+    <div style="font-size:14px; color:#9ca3af; margin-bottom:4px;">Final Score / Confidence</div>
+    <div style="font-size:22px; font-weight:700; color:#f87171;">−0.220 · 51.7% confidence · LOW conviction</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 10: RECOMMENDATION BOX -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="text-align:center; padding:28px 20px; border-radius:12px; margin:20px 0; background-color:#991b1b;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#fca5a5; margin-bottom:8px;">TODAY'S RECOMMENDATION</div>
+  <div style="font-size:28px; font-weight:800; color:#ffffff; margin:0 0 8px 0;">REDUCE</div>
+  <div style="font-size:14px; color:#fca5a5; margin-bottom:6px;">Score: −0.220 · Range: (−0.40, −0.15] · Confidence: 51.7% (LOW)</div>
+  <div style="font-size:14px; color:#fca5a5;">⟳ No change from previous recommendation (REDUCE)</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 11: POSITION GUIDANCE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Position Guidance</div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Target BTC Allocation</div>
+    <div style="font-size:28px; font-weight:800; color:#f87171; margin:0 0 4px 0;">38% BTC</div>
+    <div style="background-color:#111827; border-radius:4px; height:14px; margin-bottom:4px;">
+      <div style="width:38%; height:14px; background-color:#f87171; border-radius:4px;"></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Target Stablecoin Allocation</div>
+    <div style="font-size:28px; font-weight:800; color:#4ade80; margin:0 0 4px 0;">62% Stablecoins</div>
+    <div style="background-color:#111827; border-radius:4px; height:14px; margin-bottom:4px;">
+      <div style="width:62%; height:14px; background-color:#4ade80; border-radius:4px;"></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:14px; color:#9ca3af; margin:0 0 4px 0;">Entry Method</div>
+    <div style="font-size:22px; font-weight:700; color:#ffffff; margin:0 0 12px 0;">DCA_4WK (gradual reduction)</div>
+  </div>
+
+  <div style="padding:12px 14px; background-color:#111827; border-radius:8px;">
+    <div style="font-size:13px; color:#d4a853; font-weight:700; margin-bottom:6px;">SIZING RATIONALE</div>
+    <div style="font-size:14px; color:#e5e7eb; line-height:1.7;">
+      Base REDUCE range: 45–59% BTC → midpoint ~52%.<br>
+      BEAR cycle multiplier (0.7×): 52% × 0.7 = <strong>36.4%</strong> → rounded to 38% (rounding up given low confidence).<br>
+      VIX 18.92 &lt; 25: no volatility dampener applied.<br>
+      Confidence 51.7% (above 50% floor, no forced HOLD).<br>
+      DCA_4WK recommended: near-term ETF inflows and ceasefire sentiment support price, but structural headwinds warrant patience. Do not chase.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 12: KEY TECHNICAL LEVELS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Key Technical Levels</div>
+
+  <div style="font-size:13px; font-weight:700; color:#4ade80; margin-bottom:8px; letter-spacing:1px;">▲ SUPPORT LEVELS</div>
+
+  <div style="border-left:4px solid #22c55e; padding:10px 14px; margin-bottom:8px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:15px; font-weight:700; color:#4ade80;">$77,500 — 4H EMA20</div>
+    <div style="font-size:13px; color:#9ca3af;">Immediate dynamic support; price currently just above</div>
+  </div>
+
+  <div style="border-left:4px solid #22c55e; padding:10px 14px; margin-bottom:8px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:15px; font-weight:700; color:#4ade80;">$76,294 — 4H EMA50</div>
+    <div style="font-size:13px; color:#9ca3af;">Secondary intraday support; 4H bullish stack intact above this</div>
+  </div>
+
+  <div style="border-left:4px solid #22c55e; padding:10px 14px; margin-bottom:8px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:15px; font-weight:700; color:#4ade80;">$74,492 — Daily EMA20</div>
+    <div style="font-size:13px; color:#9ca3af;">First meaningful daily support; break invalidates near-term bullish structure</div>
+  </div>
+
+  <div style="border-left:4px solid #22c55e; padding:10px 14px; margin-bottom:8px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:15px; font-weight:700; color:#4ade80;">$72,796 — Daily EMA50</div>
+    <div style="font-size:13px; color:#9ca3af;">Key daily support; MTF bull case requires holding above this level</div>
+  </div>
+
+  <div style="border-left:4px solid #22c55e; padding:10px 14px; margin-bottom:16px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:15px; font-weight:700; color:#4ade80;">$68,466 — Daily BB Lower Band</div>
+    <div style="font-size:13px; color:#9ca3af;">Strong statistical support floor; a test would signal significant weakness</div>
+  </div>
+
+  <div style="font-size:13px; font-weight:700; color:#f87171; margin-bottom:8px; letter-spacing:1px;">▼ RESISTANCE LEVELS</div>
+
+  <div style="border-left:4px solid #ef4444; padding:10px 14px; margin-bottom:8px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:15px; font-weight:700; color:#f87171;">$79,676 — Daily BB Upper Band</div>
+    <div style="font-size:13px; color:#9ca3af;">Near-term ceiling; %B=0.85 means price is already close — limited upside room near-term</div>
+  </div>
+
+  <div style="border-left:4px solid #ef4444; padding:10px 14px; margin-bottom:8px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:15px; font-weight:700; color:#f87171;">$80,700 — Short-Term Holder Cost Basis</div>
+    <div style="font-size:13px; color:#9ca3af;">Critical psychological level; breakeven for recent buyers; clean break = sentiment shift</div>
+  </div>
+
+  <div style="border-left:4px solid #ef4444; padding:10px 14px; margin-bottom:8px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:15px; font-weight:700; color:#f87171;">$82,996 — Daily EMA200 🚨 MAJOR</div>
+    <div style="font-size:13px; color:#9ca3af;">THE key resistance; price below this = long-term downtrend intact. Bull market resumption requires reclaim.</div>
+  </div>
+
+  <div style="border-left:4px solid #ef4444; padding:10px 14px; margin-bottom:8px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:15px; font-weight:700; color:#f87171;">$87,149 — Weekly EMA50 🚨 MACRO CEILING</div>
+    <div style="font-size:13px; color:#9ca3af;">Macro-level resistance; weekly bearish EMA stack cannot flip until price sustains above this</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 13: BULLISH DRIVERS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="border-left:4px solid #22c55e; padding:20px 18px; margin-bottom:16px; background-color:#1a1f2e; border-radius:0 12px 12px 0;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#4ade80; margin:0 0 12px 0;">Bullish Drivers</div>
+  <div style="font-size:14px; color:#e5e7eb; line-height:1.8;">
+    <div style="margin-bottom:8px;">✅ <strong>ETF inflow streak:</strong> 7 consecutive inflow days, $1.685B in 7 days; IBIT +$167.5M on Apr 23 alone. 30d net +$2.648B</div>
+    <div style="margin-bottom:8px;">✅ <strong>Strategy's $2.54B BTC purchase:</strong> 34,164 BTC at avg $74,395; lifts holdings to 815,061 BTC — a major institutional demand signal</div>
+    <div style="margin-bottom:8px;">✅ <strong>Geopolitical risk easing:</strong> U.S.–Iran ceasefire extension drove risk-on positioning; VIX down to 18.92 from 31+ in late March</div>
+    <div style="margin-bottom:8px;">✅ <strong>Price recovery momentum:</strong> +16% recovery from $67k March lows; F&amp;G recovering from Extreme Fear (18) to Fear (39)</div>
+    <div style="margin-bottom:8px;">✅ <strong>4H bullish EMA stack:</strong> EMA20/EMA50/EMA200 all below price on 4H — near-term momentum constructive</div>
+    <div style="margin-bottom:8px;">✅ <strong>Weekly MACD histogram expanding bullishly:</strong> +1,899 and rising — potential weekly trend inflection forming</div>
+    <div>✅ <strong>DXY headwind easing:</strong> DXY declining from 120.9 → 118.1 over 4 weeks — directional tailwind developing</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 14: RISK FACTORS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="border-left:4px solid #ef4444; padding:20px 18px; margin-bottom:16px; background-color:#1a1f2e; border-radius:0 12px 12px 0;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#f87171; margin:0 0 12px 0;">Risk Factors</div>
+  <div style="font-size:14px; color:#e5e7eb; line-height:1.8;">
+    <div style="margin-bottom:8px;">⚠️ <strong>EARLY_BEAR cycle phase:</strong> 735 days post-halving; historically this zone produces bear market conditions with lower highs</div>
+    <div style="margin-bottom:8px;">⚠️ <strong>Daily EMA200 ($82,996) overhead:</strong> BTC is still below its daily 200-EMA; the long-term trend remains bearish until this is reclaimed</div>
+    <div style="margin-bottom:8px;">⚠️ <strong>Real yields at 1.92%:</strong> Persistently restrictive; competes directly with BTC as a store-of-value alternative</div>
+    <div style="margin-bottom:8px;">⚠️ <strong>Hash rate miner capitulation:</strong> -19.85% in 30 days signals miner financial stress; forced selling risk from distressed miners</div>
+    <div style="margin-bottom:8px;">⚠️ <strong>ATH gap remains severe:</strong> -38.19% from $126,080 ATH; psychological overhang from trapped buyers at higher prices</div>
+    <div style="margin-bottom:8px;">⚠️ <strong>Cumulative ETF net outflows:</strong> Despite recent inflows, cumulative net is still -$7.78B — structural overhang of early redemptions</div>
+    <div style="margin-bottom:8px;">⚠️ <strong>Leveraged money crowded longs (COT):</strong> Net +78,788 contracts — if real, this is a crowded long setup vulnerable to de-leveraging</div>
+    <div>⚠️ <strong>Middle East uncertainty:</strong> Ceasefire described as "indefinite" but peace talks stalled; Iran active near Strait of Hormuz — tail risk remains</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 15: CATALYST CALENDAR -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Catalyst Calendar</div>
+
+  <div style="padding:12px 14px; background-color:#111827; border-radius:8px; margin-bottom:8px;">
+    <div style="font-size:12px; color:#d97706; font-weight:700; margin-bottom:2px;">2026-04-25 — 2026-04-27 · HIGH IMPACT</div>
+    <div style="font-size:15px; color:#ffffff; font-weight:600;">U.S. PCE / Core Inflation Data</div>
+    <div style="font-size:13px; color:#9ca3af;">Key Fed inflation metric; surprise high print would pressure real-rate expectations and weigh on BTC</div>
+  </div>
+
+  <div style="padding:12px 14px; background-color:#111827; border-radius:8px; margin-bottom:8px;">
+    <div style="font-size:12px; color:#d97706; font-weight:700; margin-bottom:2px;">2026-04-30 — 2026-05-01 · HIGH IMPACT</div>
+    <div style="font-size:15px; color:#ffffff; font-weight:600;">FOMC Rate Decision (est.)</div>
+    <div style="font-size:13px; color:#9ca3af;">Fed guidance on rate path critical for real yield trajectory and risk appetite. Any dovish pivot = BTC tailwind</div>
+  </div>
+
+  <div style="padding:12px 14px; background-color:#111827; border-radius:8px; margin-bottom:8px;">
+    <div style="font-size:12px; color:#fbbf24; font-weight:700; margin-bottom:2px;">2026-05-02 · MEDIUM IMPACT</div>
+    <div style="font-size:15px; color:#ffffff; font-weight:600;">BTC Difficulty Retarget (est.)</div>
+    <div style="font-size:13px; color:#9ca3af;">Expected modest downward adjustment (-4 to -6% est.) given slower block times; relieves miner margin pressure marginally</div>
+  </div>
+
+  <div style="padding:12px 14px; background-color:#111827; border-radius:8px; margin-bottom:8px;">
+    <div style="font-size:12px; color:#fbbf24; font-weight:700; margin-bottom:2px;">2026-05-06 · MEDIUM IMPACT</div>
+    <div style="font-size:15px; color:#ffffff; font-weight:600;">CFTC COT Report (next release)</div>
+    <div style="font-size:13px; color:#9ca3af;">Will clarify whether the anomalous OI jump (41k→206k) is confirmed; watch for leveraged money positioning changes</div>
+  </div>
+
+  <div style="padding:12px 14px; background-color:#111827; border-radius:8px; margin-bottom:8px;">
+    <div style="font-size:12px; color:#9ca3af; font-weight:700; margin-bottom:2px;">2026-05 — ONGOING · MEDIUM IMPACT</div>
+    <div style="font-size:15px; color:#ffffff; font-weight:600;">Middle East Peace Negotiations / Strait of Hormuz</div>
+    <div style="font-size:13px; color:#9ca3af;">Sustained ceasefire = continued risk-on tailwind; resumption of hostilities = VIX spike, BTC headwind</div>
+  </div>
+
+  <div style="padding:12px 14px; background-color:#111827; border-radius:8px;">
+    <div style="font-size:12px; color:#6b7280; font-weight:700; margin-bottom:2px;">2028-04-07 · LONG-TERM</div>
+    <div style="font-size:15px; color:#ffffff; font-weight:600;">Next BTC Halving (~713 days)</div>
+    <div style="font-size:13px; color:#9ca3af;">Structural supply reduction event; accumulation ahead of halving historically begins 12–18 months prior</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 16: CONFLICTS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 12px 0;">Conflicts &amp; Unresolved Signals</div>
+
+  <div style="border-left:4px solid #d97706; padding:12px 14px; background-color:#1e2433; border-radius:0 8px 8px 0; margin-bottom:10px;">
+    <div style="font-size:14px; font-weight:700; color:#fbbf24; margin-bottom:4px;">CONFLICT 1: ETF Flows (BULLISH) vs Macro/On-Chain/Mining (BEARISH)</div>
+    <div style="font-size:14px; color:#e5e7eb;">Spot ETF inflows of $1.685B over 7 days represent genuine near-term institutional demand. However, 3 of 6 agents flag structural bear conditions. ETF flows reflect tactical positioning, not a cycle reversal. Hard data cycle phase (EARLY_BEAR) takes precedence. Bull case: ETF demand accelerates, forces price above $82,996 EMA200d. Bear case: Flow momentum fades as geopolitical risk re-emerges or macro headwinds persist.</div>
+  </div>
+
+  <div style="border-left:4px solid #d97706; padding:12px 14px; background-color:#1e2433; border-radius:0 8px 8px 0; margin-bottom:10px;">
+    <div style="font-size:14px; font-weight:700; color:#fbbf24; margin-bottom:4px;">CONFLICT 2: COT Data Anomaly — Date Mismatch</div>
+    <div style="font-size:14px; color:#e5e7eb;">Both "current" and "previous week" COT rows show date 2026-04-14. OI jumped from 41,171 → 205,954 and Leveraged Money net from +735 → +78,788. This is a 5× OI expansion that seems implausible in a single week. Possible explanations: (a) feed error in date labelling, (b) a contract roll/expiry reshaping OI, (c) new CME futures series opening. Treat COT positioning with reduced confidence. -10% stale data modifier applied regardless.</div>
+  </div>
+
+  <div style="border-left:4px solid #d97706; padding:12px 14px; background-color:#1e2433; border-radius:0 8px 8px 0;">
+    <div style="font-size:14px; font-weight:700; color:#fbbf24; margin-bottom:4px;">CONFLICT 3: Near-Term Price Strength vs Weekly Bearish EMA Stack</div>
+    <div style="font-size:14px; color:#e5e7eb;">4H timeframe shows bullish EMA alignment and positive price momentum. Weekly EMA50 ($87,149) remains far above current price with a -0.31%/bar downslope. These timeframes are telling two different stories. MTF penalty (-10% confidence) has been applied to Technical agent. The 4H bull narrative is a tactical signal only — the weekly bear signal is the strategic context.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 17: COMPOSITE SCORE TREND GRAPH -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#1a1f2e; border-radius:12px; padding:20px 18px; margin-bottom:16px;">
+  <div style="font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#d4a853; margin:0 0 16px 0;">Composite Score Trend (22-Day History + Today)</div>
+
+  <!-- Chart Container -->
+  <div style="display:flex; align-items:center; height:120px; padding:0 4px; position:relative;">
+    <!-- Center baseline -->
+    <div style="position:absolute; left:0; right:0; top:50%; height:1px; background-color:#374151;"></div>
+
+    <!-- Bar 1: Mar 25, -0.59 → bottom 59%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:59%;"></div>
+      </div>
+    </div>
+    <!-- Bar 2: Mar 26, -0.31 → bottom 31%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:31%;"></div>
+      </div>
+    </div>
+    <!-- Bar 3: Mar 27, -0.55 → bottom 55%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:55%;"></div>
+      </div>
+    </div>
+    <!-- Bar 4: Mar 30, -0.40 → bottom 40%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:40%;"></div>
+      </div>
+    </div>
+    <!-- Bar 5: Mar 31, -0.50 → bottom 50%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:50%;"></div>
+      </div>
+    </div>
+    <!-- Bar 6: Apr 01, -0.47 → bottom 47%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:47%;"></div>
+      </div>
+    </div>
+    <!-- Bar 7: Apr 02, -0.35 → bottom 35%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:35%;"></div>
+      </div>
+    </div>
+    <!-- Bar 8: Apr 03, -0.23 → bottom 23%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:23%;"></div>
+      </div>
+    </div>
+    <!-- Bar 9: Apr 06, -0.19 → bottom 19%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:19%;"></div>
+      </div>
+    </div>
+    <!-- Bar 10: Apr 07, -0.24 → bottom 24%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:24%;"></div>
+      </div>
+    </div>
+    <!-- Bar 11: Apr 08, 0.00 → amber, minimum 4% -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:2px 2px 0 0; background-color:#d97706; height:4%;"></div>
+      </div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;"></div>
+    </div>
+    <!-- Bar 12: Apr 09, -0.30 → bottom 30%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:30%;"></div>
+      </div>
+    </div>
+    <!-- Bar 13: Apr 10, -0.03 → amber, min 4% bottom -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#d97706; height:4%;"></div>
+      </div>
+    </div>
+    <!-- Bar 14: Apr 13, -0.15 → bottom 15%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:15%;"></div>
+      </div>
+    </div>
+    <!-- Bar 15: Apr 14, -0.17 → bottom 17%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:17%;"></div>
+      </div>
+    </div>
+    <!-- Bar 16: Apr 15, +0.09 → top 9%, green -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:2px 2px 0 0; background-color:#22c55e; height:9%;"></div>
+      </div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;"></div>
+    </div>
+    <!-- Bar 17: Apr 16, -0.05 → amber, min 4% bottom -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#d97706; height:4%;"></div>
+      </div>
+    </div>
+    <!-- Bar 18: Apr 17, -0.02 → amber, min 4% bottom -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#d97706; height:4%;"></div>
+      </div>
+    </div>
+    <!-- Bar 19: Apr 20, -0.06 → bottom 6%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:6%;"></div>
+      </div>
+    </div>
+    <!-- Bar 20: Apr 21, -0.24 → bottom 24%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:24%;"></div>
+      </div>
+    </div>
+    <!-- Bar 21: Apr 22, -0.22 → bottom 22%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:22%;"></div>
+      </div>
+    </div>
+    <!-- Bar 22: Apr 23, -0.17 → bottom 17%, red -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:6px; border-radius:0 0 2px 2px; background-color:#ef4444; height:17%;"></div>
+      </div>
+    </div>
+    <!-- Bar 23: Apr 24 TODAY, -0.220 → bottom 22%, red (brighter) -->
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%;">
+      <div style="flex:1; display:flex; align-items:flex-end; width:100%; justify-content:center;"></div>
+      <div style="flex:1; display:flex; align-items:flex-start; width:100%; justify-content:center;">
+        <div style="width:80%; max-width:7px; border-radius:0 0 2px 2px; background-color:#fca5a5; height:22%; box-shadow:0 0 4px #fca5a5;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date Labels -->
+  <div style="display:flex; padding:4px 4px 0 4px;">
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;">Mar 25</div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;">Apr 15</div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#6b7280; text-align:center;"></div>
+    <div style="flex:1; font-size:9px; color:#fca5a5; text-align:center;">Apr 24</div>
+  </div>
+
+  <!-- Legend -->
+  <div style="display:flex; justify-content:center; font-size:11px; color:#6b7280; margin-top:6px;">
+    <span style="color:#22c55e; margin-right:16px;">&#9650; Bullish</span>
+    <span style="color:#d97706; margin-right:16px;">&#9644; Neutral</span>
+    <span style="color:#ef4444; margin-right:16px;">&#9660; Bearish</span>
+    <span style="color:#fca5a5;">&#9660; Today</span>
+  </div>
+
+  <!-- Score range labels -->
+  <div style="display:flex; justify-content:space-between; margin-top:8px; padding:0 4px;">
+    <div style="font-size:10px; color:#6b7280;">Score range: −0.59 (Mar 25 low)</div>
+    <div style="font-size:10px; color:#22c55e;">Peak: +0.09 (Apr 15)</div>
+    <div style="font-size:10px; color:#fca5a5;">Today: −0.22</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div style="background-color:#111827; border-radius:12px; padding:16px 18px; margin-bottom:16px; text-align:center;">
+  <div style="font-size:12px; color:#6b7280; line-height:1.7;">
+    Generated by CIO Orchestrator · 2026-04-24T00:00:00Z<br>
+    Data sources: CoinGecko, FRED, SoSoValue, Mempool.space, CFTC, CryptoCompare (all API-sourced)<br>
+    Next review: 2026-04-25T00:00:00Z<br>
+    <strong style="color:#9ca3af;">This report is for informational purposes only. Not financial advice.</strong>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
