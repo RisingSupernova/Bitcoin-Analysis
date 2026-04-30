@@ -1,11 +1,12 @@
 {
+  "email_subject": "Bitcoin Report - 30-04-2026 | REDUCE | MEDIUM CONVICTION",
   "recommendation": "REDUCE",
-  "confidence": 58,
   "conviction": "MEDIUM",
+  "confidence": 58,
   "composite_score": -0.395,
   "market_regime": "BEAR",
   "cycle_phase": "EARLY_BEAR",
   "btc_allocation_pct": 37.0,
   "stablecoin_allocation_pct": 63.0,
-  "timestamp": "2026-04-30T06:36:27.942955+00:00"
+  "date": "20260430"
 }
