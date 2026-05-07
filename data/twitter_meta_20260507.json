@@ -1,11 +1,12 @@
 {
+  "email_subject": "Bitcoin Report - 07-05-2026 | HOLD | LOW CONVICTION",
   "recommendation": "HOLD",
-  "confidence": 49,
   "conviction": "LOW",
+  "confidence": 49,
   "composite_score": -0.16,
   "market_regime": "BEAR",
   "cycle_phase": "EARLY_BEAR",
   "btc_allocation_pct": 50.0,
   "stablecoin_allocation_pct": 50.0,
-  "timestamp": "2026-05-07T06:45:22.114127+00:00"
+  "date": "20260507"
 }
