@@ -1,11 +1,12 @@
 {
+  "email_subject": "Bitcoin Report - 19-05-2026 | STRONG_SELL | HIGH CONVICTION",
   "recommendation": "STRONG_SELL",
-  "confidence": 88,
   "conviction": "HIGH",
+  "confidence": 88,
   "composite_score": -0.53,
   "market_regime": "BEAR",
   "cycle_phase": "EARLY_BEAR",
   "btc_allocation_pct": 25.0,
   "stablecoin_allocation_pct": 75.0,
-  "timestamp": "2026-05-19T07:58:03.514160+00:00"
+  "date": "20260519"
 }
